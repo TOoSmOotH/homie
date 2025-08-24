@@ -1,0 +1,167 @@
+{
+  "id": "jellyfin",
+  "name": "Jellyfin",
+  "version": "10.8.13",
+  "author": "Jellyfin Contributors",
+  "description": "The free and open-source media server",
+  "longDescription": "Jellyfin is a free and open-source media server and suite of multimedia applications designed to organize, manage, and share digital media files to networked devices. Unlike Plex, Jellyfin is completely free with no premium tiers.",
+  "category": "media",
+  "tags": ["media", "streaming", "open-source", "movies", "tv", "music", "free"],
+  "icon": "jellyfin.svg",
+  "homepage": "https://jellyfin.org",
+  "repository": "https://github.com/jellyfin/jellyfin",
+  "documentation": "https://jellyfin.org/docs",
+  "license": "GPL-2.0",
+  "featured": true,
+  "official": true,
+  "requirements": {
+    "docker": true,
+    "minMemory": "1GB",
+    "minStorage": "5GB",
+    "ports": [8096, 8920]
+  },
+  "docker": {
+    "image": "jellyfin/jellyfin",
+    "tag": "latest",
+    "ports": [
+      {
+        "container": 8096,
+        "host": 8096,
+        "protocol": "tcp"
+      },
+      {
+        "container": 8920,
+        "host": 8920,
+        "protocol": "tcp"
+      }
+    ],
+    "volumes": [
+      {
+        "container": "/config",
+        "host": "./config/jellyfin"
+      },
+      {
+        "container": "/media",
+        "host": "./media",
+        "mode": "ro"
+      },
+      {
+        "container": "/cache",
+        "host": "./cache/jellyfin"
+      }
+    ],
+    "environment": {
+      "JELLYFIN_PublishedServerUrl": "http://{host}:8096"
+    },
+    "restart": "unless-stopped",
+    "devices": ["/dev/dri"]
+  },
+  "config": {
+    "fields": [
+      {
+        "key": "server_name",
+        "label": "Server Name",
+        "type": "text",
+        "required": true,
+        "default": "Jellyfin",
+        "description": "Name for your Jellyfin server"
+      },
+      {
+        "key": "http_port",
+        "label": "HTTP Port",
+        "type": "port",
+        "required": true,
+        "default": 8096,
+        "validation": {
+          "min": 1024,
+          "max": 65535
+        }
+      },
+      {
+        "key": "https_port",
+        "label": "HTTPS Port",
+        "type": "port",
+        "required": false,
+        "default": 8920,
+        "validation": {
+          "min": 1024,
+          "max": 65535
+        }
+      },
+      {
+        "key": "media_path",
+        "label": "Media Library Path",
+        "type": "path",
+        "required": true,
+        "placeholder": "/path/to/media",
+        "description": "Path to your media files"
+      },
+      {
+        "key": "cache_path",
+        "label": "Cache Path",
+        "type": "path",
+        "required": false,
+        "placeholder": "/path/to/cache",
+        "description": "Path for cache and temporary files"
+      },
+      {
+        "key": "hardware_acceleration",
+        "label": "Enable Hardware Acceleration",
+        "type": "boolean",
+        "required": false,
+        "default": false,
+        "description": "Enable GPU hardware acceleration for transcoding"
+      },
+      {
+        "key": "enable_https",
+        "label": "Enable HTTPS",
+        "type": "boolean",
+        "required": false,
+        "default": false,
+        "description": "Enable HTTPS access (requires SSL certificate)"
+      }
+    ]
+  },
+  "api": {
+    "baseUrlPattern": "http://{host}:{port}",
+    "authType": "apikey",
+    "apiKeyField": "api_key",
+    "endpoints": {
+      "health": "/health",
+      "test": "/System/Info/Public"
+    }
+  },
+  "quickActions": [
+    {
+      "id": "open_web",
+      "name": "Open Web UI",
+      "icon": "🌐",
+      "action": "open_url",
+      "config": {
+        "url": "http://{host}:{port}"
+      }
+    },
+    {
+      "id": "admin_dashboard",
+      "name": "Admin Dashboard",
+      "icon": "⚙️",
+      "action": "open_url",
+      "config": {
+        "url": "http://{host}:{port}/web/index.html#!/dashboard"
+      }
+    }
+  ],
+  "setupSteps": [
+    "Container will be created with your specified configuration",
+    "Access Jellyfin at http://your-server:8096",
+    "Complete the setup wizard",
+    "Create your admin account",
+    "Add your media libraries",
+    "Install Jellyfin apps on your devices"
+  ],
+  "screenshots": [
+    "jellyfin-home.png",
+    "jellyfin-library.png",
+    "jellyfin-player.png"
+  ]
+}

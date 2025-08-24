@@ -1,0 +1,25 @@
+{
+  "name": "@homie/shared",
+  "version": "1.0.0",
+  "description": "Shared types and utilities for Homie",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "homie",
+    "shared",
+    "types",
+    "typescript"
+  ]
+}

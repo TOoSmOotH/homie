@@ -1,0 +1,358 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Homie Service Definition",
+  "type": "object",
+  "required": ["id", "name", "version", "author", "description", "category"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Unique identifier for the service (lowercase, alphanumeric with hyphens)"
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name of the service"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Service version (semver format)"
+    },
+    "author": {
+      "type": "string",
+      "description": "Service author or maintainer"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 200,
+      "description": "Short description of the service"
+    },
+    "longDescription": {
+      "type": "string",
+      "description": "Detailed description of the service"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["media", "automation", "monitoring", "networking", "storage", "security", "development", "productivity", "communication", "gaming", "home-automation", "data", "infrastructure", "other"]
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tags for searching and filtering"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Icon filename or emoji"
+    },
+    "homepage": {
+      "type": "string",
+      "format": "uri",
+      "description": "Service homepage URL"
+    },
+    "repository": {
+      "type": "string",
+      "format": "uri",
+      "description": "Source code repository URL"
+    },
+    "documentation": {
+      "type": "string",
+      "format": "uri",
+      "description": "Documentation URL"
+    },
+    "license": {
+      "type": "string",
+      "description": "Service license"
+    },
+    "requirements": {
+      "type": "object",
+      "properties": {
+        "docker": {
+          "type": "boolean",
+          "default": true
+        },
+        "minMemory": {
+          "type": "string",
+          "description": "Minimum memory requirement (e.g., '512MB')"
+        },
+        "minStorage": {
+          "type": "string",
+          "description": "Minimum storage requirement (e.g., '1GB')"
+        },
+        "ports": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Required ports"
+        }
+      }
+    },
+    "docker": {
+      "type": "object",
+      "required": ["image"],
+      "properties": {
+        "image": {
+          "type": "string",
+          "description": "Docker image name"
+        },
+        "tag": {
+          "type": "string",
+          "default": "latest",
+          "description": "Docker image tag"
+        },
+        "ports": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["container"],
+            "properties": {
+              "container": {
+                "type": "integer",
+                "description": "Container port"
+              },
+              "host": {
+                "type": "integer",
+                "description": "Host port (optional, will use container port if not specified)"
+              },
+              "protocol": {
+                "type": "string",
+                "enum": ["tcp", "udp"],
+                "default": "tcp"
+              }
+            }
+          }
+        },
+        "volumes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["container"],
+            "properties": {
+              "container": {
+                "type": "string",
+                "description": "Container path"
+              },
+              "host": {
+                "type": "string",
+                "description": "Host path (will be generated if not specified)"
+              },
+              "mode": {
+                "type": "string",
+                "enum": ["rw", "ro"],
+                "default": "rw"
+              }
+            }
+          }
+        },
+        "environment": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Environment variables"
+        },
+        "networks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Docker networks to join"
+        },
+        "restart": {
+          "type": "string",
+          "enum": ["no", "unless-stopped", "always", "on-failure"],
+          "default": "unless-stopped"
+        },
+        "command": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Override default command"
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Linux capabilities to add"
+        },
+        "devices": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Devices to pass through"
+        }
+      }
+    },
+    "config": {
+      "type": "object",
+      "properties": {
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["key", "label", "type"],
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "Field identifier"
+              },
+              "label": {
+                "type": "string",
+                "description": "Display label"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["text", "password", "number", "boolean", "select", "url", "port", "path", "email"]
+              },
+              "required": {
+                "type": "boolean",
+                "default": false
+              },
+              "default": {
+                "description": "Default value"
+              },
+              "placeholder": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "validation": {
+                "type": "object",
+                "properties": {
+                  "pattern": {
+                    "type": "string"
+                  },
+                  "min": {
+                    "type": "number"
+                  },
+                  "max": {
+                    "type": "number"
+                  },
+                  "minLength": {
+                    "type": "integer"
+                  },
+                  "maxLength": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "options": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["value", "label"],
+                  "properties": {
+                    "value": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "dependsOn": {
+                "type": "string",
+                "description": "Field key that this field depends on"
+              },
+              "showIf": {
+                "type": "object",
+                "properties": {
+                  "field": {
+                    "type": "string"
+                  },
+                  "value": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "api": {
+      "type": "object",
+      "properties": {
+        "baseUrlPattern": {
+          "type": "string",
+          "description": "URL pattern with placeholders (e.g., 'http://{host}:{port}')"
+        },
+        "authType": {
+          "type": "string",
+          "enum": ["none", "apikey", "basic", "oauth2", "custom"]
+        },
+        "apiKeyField": {
+          "type": "string",
+          "description": "Config field that contains the API key"
+        },
+        "endpoints": {
+          "type": "object",
+          "properties": {
+            "health": {
+              "type": "string",
+              "description": "Health check endpoint"
+            },
+            "test": {
+              "type": "string",
+              "description": "Test connection endpoint"
+            }
+          }
+        }
+      }
+    },
+    "quickActions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "action"],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string",
+            "enum": ["open_url", "api_call", "docker_command", "custom"]
+          },
+          "config": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "screenshots": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Screenshot URLs or filenames"
+    },
+    "setupSteps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Setup instructions"
+    },
+    "featured": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this service is featured"
+    },
+    "official": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this is an official/verified service"
+    }
+  }
+}

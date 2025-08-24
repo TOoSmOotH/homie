@@ -1,0 +1,74 @@
+services:
+  homie:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.production
+      target: production
+    image: homie:latest
+    container_name: homie
+    restart: unless-stopped
+
+    # Environment configuration
+    env_file:
+      - .env.production
+    environment:
+      - NODE_ENV=production
+      - TZ=${TZ:-UTC}
+
+    # Port configuration
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+
+    # Volume mounts for persistent data
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./ssl:/etc/letsencrypt
+
+    # Health checks
+    healthcheck:
+      test: ["CMD", "/app/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    # Resource limits (optional, can be adjusted based on your needs)
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+    # Security options
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+      - CHOWN
+      - SETUID
+      - SETGID
+      - DAC_OVERRIDE
+
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # Networks
+    networks:
+      - homie-network
+
+# Networks
+networks:
+  homie-network:
+    driver: bridge
+    name: homie-network

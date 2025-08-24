@@ -1,0 +1,26 @@
+# Development Dockerfile with hot reload support
+FROM node:22-alpine
+
+# Install development dependencies
+RUN apk add --no-cache python3 py3-setuptools make g++ sqlite-dev git
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY backend/package*.json ./backend/
+COPY frontend/package*.json ./frontend/
+COPY shared/package*.json ./shared/
+
+# Install all dependencies including dev
+RUN npm ci --include=dev
+
+# Copy source code
+COPY . .
+
+# Expose ports
+EXPOSE 3000 3001 9229
+
+# Default command for development
+CMD ["npm", "run", "dev"]

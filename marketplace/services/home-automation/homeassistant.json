@@ -1,0 +1,165 @@
+{
+  "id": "homeassistant",
+  "name": "Home Assistant",
+  "version": "2024.1",
+  "author": "Home Assistant",
+  "description": "Open source home automation that puts local control and privacy first",
+  "longDescription": "Home Assistant is an open-source home automation platform that focuses on privacy and local control. It supports thousands of devices and services, allowing you to control all your devices from a single, mobile-friendly interface.",
+  "category": "home-automation",
+  "tags": ["smart-home", "automation", "iot", "privacy", "local-control", "zigbee", "z-wave"],
+  "icon": "homeassistant.svg",
+  "homepage": "https://www.home-assistant.io",
+  "repository": "https://github.com/home-assistant/core",
+  "documentation": "https://www.home-assistant.io/docs",
+  "license": "Apache-2.0",
+  "featured": true,
+  "official": true,
+  "requirements": {
+    "docker": true,
+    "minMemory": "2GB",
+    "minStorage": "2GB",
+    "ports": [8123]
+  },
+  "docker": {
+    "image": "homeassistant/home-assistant",
+    "tag": "stable",
+    "ports": [
+      {
+        "container": 8123,
+        "host": 8123,
+        "protocol": "tcp"
+      }
+    ],
+    "volumes": [
+      {
+        "container": "/config",
+        "host": "./config/homeassistant"
+      }
+    ],
+    "environment": {
+      "TZ": "America/New_York"
+    },
+    "restart": "unless-stopped",
+    "capabilities": ["NET_ADMIN", "NET_RAW"],
+    "devices": ["/dev/ttyUSB0", "/dev/ttyACM0"]
+  },
+  "config": {
+    "fields": [
+      {
+        "key": "port",
+        "label": "Web UI Port",
+        "type": "port",
+        "required": true,
+        "default": 8123,
+        "validation": {
+          "min": 1024,
+          "max": 65535
+        }
+      },
+      {
+        "key": "config_path",
+        "label": "Configuration Path",
+        "type": "path",
+        "required": true,
+        "placeholder": "/path/to/config",
+        "description": "Where to store Home Assistant configuration"
+      },
+      {
+        "key": "timezone",
+        "label": "Timezone",
+        "type": "select",
+        "required": true,
+        "default": "America/New_York",
+        "options": [
+          { "value": "America/New_York", "label": "Eastern Time" },
+          { "value": "America/Chicago", "label": "Central Time" },
+          { "value": "America/Denver", "label": "Mountain Time" },
+          { "value": "America/Los_Angeles", "label": "Pacific Time" },
+          { "value": "Europe/London", "label": "GMT/London" },
+          { "value": "Europe/Paris", "label": "Central European Time" }
+        ]
+      },
+      {
+        "key": "enable_usb",
+        "label": "Enable USB Devices",
+        "type": "boolean",
+        "required": false,
+        "default": true,
+        "description": "Pass through USB devices for Zigbee/Z-Wave adapters"
+      },
+      {
+        "key": "network_mode",
+        "label": "Network Mode",
+        "type": "select",
+        "required": false,
+        "default": "bridge",
+        "options": [
+          { "value": "bridge", "label": "Bridge (Default)" },
+          { "value": "host", "label": "Host (Required for some integrations)" }
+        ],
+        "description": "Network mode for the container"
+      }
+    ]
+  },
+  "api": {
+    "baseUrlPattern": "http://{host}:{port}",
+    "authType": "custom",
+    "endpoints": {
+      "health": "/api/config",
+      "test": "/api/"
+    }
+  },
+  "quickActions": [
+    {
+      "id": "open_web",
+      "name": "Open Dashboard",
+      "icon": "🏠",
+      "action": "open_url",
+      "config": {
+        "url": "http://{host}:{port}"
+      }
+    },
+    {
+      "id": "settings",
+      "name": "Settings",
+      "icon": "⚙️",
+      "action": "open_url",
+      "config": {
+        "url": "http://{host}:{port}/config"
+      }
+    },
+    {
+      "id": "integrations",
+      "name": "Integrations",
+      "icon": "🔌",
+      "action": "open_url",
+      "config": {
+        "url": "http://{host}:{port}/config/integrations"
+      }
+    },
+    {
+      "id": "automations",
+      "name": "Automations",
+      "icon": "🤖",
+      "action": "open_url",
+      "config": {
+        "url": "http://{host}:{port}/config/automation"
+      }
+    }
+  ],
+  "setupSteps": [
+    "Container will be created with your specified configuration",
+    "Access Home Assistant at http://your-server:8123",
+    "Create your admin account",
+    "Set up your home location",
+    "Discover and add devices on your network",
+    "Install integrations for your devices",
+    "Create automations and scenes",
+    "Install the mobile app for remote access"
+  ],
+  "screenshots": [
+    "homeassistant-dashboard.png",
+    "homeassistant-automations.png",
+    "homeassistant-integrations.png"
+  ]
+}

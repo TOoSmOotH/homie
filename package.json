@@ -1,0 +1,51 @@
+{
+  "name": "homie",
+  "version": "1.0.0",
+  "description": "Home Lab Management Application",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend",
+    "shared"
+  ],
+  "scripts": {
+    "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"blue,cyan\" \"npm run dev --workspace=@homie/backend\" \"npm run dev --workspace=@homie/frontend\"",
+    "dev:backend": "npm run dev --workspace=@homie/backend",
+    "dev:frontend": "npm run dev --workspace=@homie/frontend",
+    "build": "npm run build --workspace=@homie/shared && npm run build --workspace=@homie/backend && npm run build --workspace=@homie/frontend",
+    "build:shared": "npm run build --workspace=@homie/shared",
+    "build:backend": "npm run build --workspace=@homie/backend",
+    "build:frontend": "npm run build --workspace=@homie/frontend",
+    "test": "npm run test --workspace=@homie/backend && npm run test --workspace=@homie/frontend",
+    "lint": "npm run lint --workspace=@homie/backend && npm run lint --workspace=@homie/frontend",
+    "docker:dev": "docker compose -f docker-compose.dev.yml up",
+    "docker:prod": "docker compose up",
+    "docker:build": "docker compose build",
+    "setup": "./scripts/setup.sh",
+    "clean": "rm -rf backend/dist frontend/dist shared/dist data/*.db node_modules/.cache"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "concurrently": "^7.6.0",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "."
+  },
+  "keywords": [
+    "home-lab",
+    "monitoring",
+    "proxmox",
+    "docker",
+    "management"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}

@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  homie:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.production
+    ports:
+      - "8080:80"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ../data:/app/data
+      - ../logs:/app/logs
+    restart: unless-stopped
+
+  database:
+    image: alpine:latest
+    volumes:
+      - ../data:/data
+    command: ["sh", "-c", "mkdir -p /data && chmod 777 /data"]
+    restart: unless-stopped
+
+networks:
+  default:
+    name: homie-prod

@@ -1,0 +1,169 @@
+{
+  "id": "plex",
+  "name": "Plex Media Server",
+  "version": "1.32.8",
+  "author": "Plex Inc.",
+  "description": "Stream your media collection to any device, anywhere",
+  "longDescription": "Plex organizes your video, music, and photo collections and streams them to all of your devices. With a Plex Media Server, you can stream your media to your phone, tablet, streaming device, game console, and more.",
+  "category": "media",
+  "tags": ["media", "streaming", "movies", "tv", "music", "photos"],
+  "icon": "plex.svg",
+  "homepage": "https://www.plex.tv",
+  "documentation": "https://support.plex.tv",
+  "license": "Proprietary",
+  "featured": true,
+  "official": true,
+  "requirements": {
+    "docker": true,
+    "minMemory": "2GB",
+    "minStorage": "10GB",
+    "ports": [32400]
+  },
+  "docker": {
+    "image": "plexinc/pms-docker",
+    "tag": "latest",
+    "ports": [
+      {
+        "container": 32400,
+        "host": 32400,
+        "protocol": "tcp"
+      }
+    ],
+    "volumes": [
+      {
+        "container": "/config",
+        "host": "./config/plex"
+      },
+      {
+        "container": "/data",
+        "host": "./media",
+        "mode": "ro"
+      },
+      {
+        "container": "/transcode",
+        "host": "./transcode"
+      }
+    ],
+    "environment": {
+      "PLEX_UID": "1000",
+      "PLEX_GID": "1000",
+      "TZ": "America/New_York",
+      "VERSION": "docker"
+    },
+    "restart": "unless-stopped",
+    "devices": ["/dev/dri"]
+  },
+  "config": {
+    "fields": [
+      {
+        "key": "claim_token",
+        "label": "Claim Token",
+        "type": "text",
+        "required": false,
+        "placeholder": "claim-xxxxxxxxxxxx",
+        "description": "Get your claim token from https://www.plex.tv/claim (optional for initial setup)"
+      },
+      {
+        "key": "hostname",
+        "label": "Server Name",
+        "type": "text",
+        "required": true,
+        "default": "PlexServer",
+        "description": "Name for your Plex server"
+      },
+      {
+        "key": "port",
+        "label": "Web UI Port",
+        "type": "port",
+        "required": true,
+        "default": 32400,
+        "validation": {
+          "min": 1024,
+          "max": 65535
+        }
+      },
+      {
+        "key": "media_path",
+        "label": "Media Library Path",
+        "type": "path",
+        "required": true,
+        "placeholder": "/path/to/media",
+        "description": "Path to your media files"
+      },
+      {
+        "key": "transcode_path",
+        "label": "Transcode Path",
+        "type": "path",
+        "required": false,
+        "placeholder": "/path/to/transcode",
+        "description": "Path for temporary transcoding files (optional, uses RAM if not set)"
+      },
+      {
+        "key": "hardware_acceleration",
+        "label": "Enable Hardware Acceleration",
+        "type": "boolean",
+        "required": false,
+        "default": false,
+        "description": "Enable GPU hardware acceleration for transcoding (requires compatible GPU)"
+      },
+      {
+        "key": "timezone",
+        "label": "Timezone",
+        "type": "select",
+        "required": true,
+        "default": "America/New_York",
+        "options": [
+          { "value": "America/New_York", "label": "Eastern Time" },
+          { "value": "America/Chicago", "label": "Central Time" },
+          { "value": "America/Denver", "label": "Mountain Time" },
+          { "value": "America/Los_Angeles", "label": "Pacific Time" },
+          { "value": "Europe/London", "label": "GMT/London" },
+          { "value": "Europe/Paris", "label": "Central European Time" },
+          { "value": "Asia/Tokyo", "label": "Japan Time" },
+          { "value": "Australia/Sydney", "label": "Sydney Time" }
+        ]
+      }
+    ]
+  },
+  "api": {
+    "baseUrlPattern": "http://{host}:{port}",
+    "authType": "custom",
+    "endpoints": {
+      "health": "/identity",
+      "test": "/identity"
+    }
+  },
+  "quickActions": [
+    {
+      "id": "open_web",
+      "name": "Open Web UI",
+      "icon": "🌐",
+      "action": "open_url",
+      "config": {
+        "url": "http://{host}:{port}/web"
+      }
+    },
+    {
+      "id": "manage_libraries",
+      "name": "Manage Libraries",
+      "icon": "📚",
+      "action": "open_url",
+      "config": {
+        "url": "http://{host}:{port}/web/index.html#!/settings/server/manage-library"
+      }
+    }
+  ],
+  "setupSteps": [
+    "Container will be created with your specified configuration",
+    "Access Plex Web UI at http://your-server:32400/web",
+    "Sign in with your Plex account",
+    "Add your media libraries",
+    "Configure remote access if desired",
+    "Install Plex apps on your devices"
+  ],
+  "screenshots": [
+    "plex-dashboard.png",
+    "plex-library.png",
+    "plex-player.png"
+  ]
+}

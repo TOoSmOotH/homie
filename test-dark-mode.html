@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Dark Mode</title>
+</head>
+<body>
+    <h1>Dark Mode Test</h1>
+    <button onclick="setDarkMode()">Set Dark Mode</button>
+    <button onclick="setLightMode()">Set Light Mode</button>
+    <button onclick="checkStatus()">Check Status</button>
+    <div id="status"></div>
+    
+    <script>
+        function setDarkMode() {
+            localStorage.setItem('theme', 'dark');
+            document.getElementById('status').innerHTML = 'Dark mode set in localStorage. Refresh the app.';
+        }
+        
+        function setLightMode() {
+            localStorage.setItem('theme', 'light');
+            document.getElementById('status').innerHTML = 'Light mode set in localStorage. Refresh the app.';
+        }
+        
+        function checkStatus() {
+            const theme = localStorage.getItem('theme');
+            const hasDarkClass = document.documentElement.classList.contains('dark');
+            document.getElementById('status').innerHTML = 
+                `Current theme in localStorage: ${theme || 'not set'}<br>` +
+                `HTML has dark class: ${hasDarkClass}`;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+{
+  "id": "radarr",
+  "name": "Radarr",
+  "version": "5.2.6",
+  "author": "Radarr Team",
+  "description": "Movie collection manager for Usenet and BitTorrent users",
+  "longDescription": "Radarr is a movie collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new movies and will interface with clients and indexers to grab, sort, and rename them.",
+  "category": "automation",
+  "tags": ["movies", "automation", "download", "usenet", "torrent", "media-management"],
+  "icon": "radarr.svg",
+  "homepage": "https://radarr.video",
+  "repository": "https://github.com/Radarr/Radarr",
+  "documentation": "https://wiki.servarr.com/radarr",
+  "license": "GPL-3.0",
+  "featured": true,
+  "official": true,
+  "requirements": {
+    "docker": true,
+    "minMemory": "512MB",
+    "minStorage": "1GB",
+    "ports": [7878]
+  },
+  "docker": {
+    "image": "linuxserver/radarr",
+    "tag": "latest",
+    "ports": [
+      {
+        "container": 7878,
+        "host": 7878,
+        "protocol": "tcp"
+      }
+    ],
+    "volumes": [
+      {
+        "container": "/config",
+        "host": "./config/radarr"
+      },
+      {
+        "container": "/movies",
+        "host": "./media/movies"
+      },
+      {
+        "container": "/downloads",
+        "host": "./downloads"
+      }
+    ],
+    "environment": {
+      "PUID": "1000",
+      "PGID": "1000",
+      "TZ": "America/New_York"
+    },
+    "restart": "unless-stopped"
+  },
+  "config": {
+    "fields": [
+      {
+        "key": "port",
+        "label": "Web UI Port",
+        "type": "port",
+        "required": true,
+        "default": 7878,
+        "validation": {
+          "min": 1024,
+          "max": 65535
+        }
+      },
+      {
+        "key": "movies_path",
+        "label": "Movies Path",
+        "type": "path",
+        "required": true,
+        "placeholder": "/path/to/movies",
+        "description": "Where to store your movie library"
+      },
+      {
+        "key": "downloads_path",
+        "label": "Downloads Path",
+        "type": "path",
+        "required": true,
+        "placeholder": "/path/to/downloads",
+        "description": "Where your download client saves files"
+      },
+      {
+        "key": "api_key",
+        "label": "API Key",
+        "type": "password",
+        "required": false,
+        "description": "API key for external access (generated after first setup)"
+      },
+      {
+        "key": "timezone",
+        "label": "Timezone",
+        "type": "select",
+        "required": true,
+        "default": "America/New_York",
+        "options": [
+          { "value": "America/New_York", "label": "Eastern Time" },
+          { "value": "America/Chicago", "label": "Central Time" },
+          { "value": "America/Denver", "label": "Mountain Time" },
+          { "value": "America/Los_Angeles", "label": "Pacific Time" },
+          { "value": "Europe/London", "label": "GMT/London" },
+          { "value": "Europe/Paris", "label": "Central European Time" }
+        ]
+      },
+      {
+        "key": "uid",
+        "label": "User ID",
+        "type": "number",
+        "required": false,
+        "default": 1000,
+        "description": "User ID for file permissions"
+      },
+      {
+        "key": "gid",
+        "label": "Group ID",
+        "type": "number",
+        "required": false,
+        "default": 1000,
+        "description": "Group ID for file permissions"
+      }
+    ]
+  },
+  "api": {
+    "baseUrlPattern": "http://{host}:{port}",
+    "authType": "apikey",
+    "apiKeyField": "api_key",
+    "endpoints": {
+      "health": "/api/v3/health",
+      "test": "/api/v3/system/status"
+    }
+  },
+  "quickActions": [
+    {
+      "id": "open_web",
+      "name": "Open Web UI",
+      "icon": "🌐",
+      "action": "open_url",
+      "config": {
+        "url": "http://{host}:{port}"
+      }
+    },
+    {
+      "id": "add_movie",
+      "name": "Add Movie",
+      "icon": "➕",
+      "action": "open_url",
+      "config": {
+        "url": "http://{host}:{port}/add/new"
+      }
+    },
+    {
+      "id": "calendar",
+      "name": "Calendar",
+      "icon": "📅",
+      "action": "open_url",
+      "config": {
+        "url": "http://{host}:{port}/calendar"
+      }
+    }
+  ],
+  "setupSteps": [
+    "Container will be created with your specified configuration",
+    "Access Radarr at http://your-server:7878",
+    "Complete the setup wizard",
+    "Add download clients (SABnzbd, qBittorrent, etc.)",
+    "Add indexers (Usenet or Torrent)",
+    "Configure quality profiles",
+    "Start adding movies to monitor"
+  ],
+  "screenshots": [
+    "radarr-library.png",
+    "radarr-calendar.png",
+    "radarr-activity.png"
+  ]
+}

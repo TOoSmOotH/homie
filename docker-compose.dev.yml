@@ -1,0 +1,46 @@
+services:
+  homie-dev:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+    image: homie:dev
+    container_name: homie-dev
+    restart: unless-stopped
+
+    # Environment configuration
+    env_file:
+      - .env.development
+    environment:
+      - NODE_ENV=development
+      - TZ=${TZ:-UTC}
+
+    # Port configuration
+    ports:
+      - "3000:3000"     # Frontend dev server
+      - "3001:3001"     # Backend API
+      - "9229:9229"     # Node.js debugger
+
+    # Volume mounts for development (with hot reload)
+    volumes:
+      - ./backend:/app/backend
+      - ./frontend:/app/frontend
+      - ./shared:/app/shared
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - /app/node_modules
+      - /app/backend/node_modules
+      - /app/frontend/node_modules
+      - /app/shared/node_modules
+
+    # Development command
+    command: npm run dev
+
+    # Networks
+    networks:
+      - homie-dev-network
+
+# Networks
+networks:
+  homie-dev-network:
+    driver: bridge
+    name: homie-dev-network
