@@ -63,18 +63,9 @@ class EmailService {
 
       this.isConfigured = true;
 
-      // Verify connection
-      if (this.transporter) {
-        this.transporter.verify((error) => {
-          if (error) {
-            logger.error('Email service verification failed:', error);
-            logger.info('Please check your SMTP configuration');
-            this.isConfigured = false;
-          } else {
-            logger.info('Email service ready');
-          }
-        });
-      }
+      // Verify connection - skip verification on startup to avoid connection attempts
+      // Verification will happen when actually trying to send an email
+      logger.info('Email service configured - verification will occur on first use');
     } catch (error) {
       logger.error('Failed to initialize email service:', error);
       this.isConfigured = false;

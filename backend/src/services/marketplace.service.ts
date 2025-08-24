@@ -20,8 +20,8 @@ export class MarketplaceService {
   private constructor(config: MarketplaceConfig = {}) {
     this.config = {
       localPath: config.localPath || path.join(process.cwd(), '..', 'marketplace'),
-      remoteUrl: config.remoteUrl || process.env.MARKETPLACE_REPO_URL || 'https://raw.githubusercontent.com/yourusername/homie/main/marketplace',
-      autoSync: config.autoSync ?? process.env.MARKETPLACE_AUTO_SYNC === 'true' ?? true,
+      remoteUrl: config.remoteUrl || process.env.MARKETPLACE_REPO_URL || 'https://raw.githubusercontent.com/TOoSmOotH/homie/main',
+      autoSync: config.autoSync !== undefined ? config.autoSync : (process.env.MARKETPLACE_AUTO_SYNC === 'true' || true),
       syncInterval: config.syncInterval || parseInt(process.env.MARKETPLACE_SYNC_INTERVAL || '60', 10) // Default: sync every hour
     };
   }
