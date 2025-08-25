@@ -1,0 +1,86 @@
+{
+  "id": "pihole",
+  "name": "Pi-hole",
+  "version": "2024.01.0",
+  "author": "Pi-hole Team",
+  "description": "Network-wide ad blocking & local DNS server",
+  "longDescription": "Pi-hole is a DNS sinkhole that protects your devices from unwanted content without installing any client-side software. It blocks ads, trackers, and malicious domains network-wide.",
+  "category": "networking",
+  "tags": ["dns", "ad-blocking", "privacy", "network", "security"],
+  "icon": "🛡️",
+  "homepage": "https://pi-hole.net",
+  "repository": "https://github.com/pi-hole/pi-hole",
+  "documentation": "https://docs.pi-hole.net",
+  "license": "EUPL-1.2",
+  "featured": true,
+  "official": true,
+  "requirements": {
+    "docker": true,
+    "minMemory": "512MB",
+    "minStorage": "200MB",
+    "ports": [80, 53]
+  },
+  "docker": {
+    "image": "pihole/pihole",
+    "tag": "latest",
+    "ports": [
+      {
+        "container": 80,
+        "host": 8080,
+        "protocol": "tcp"
+      },
+      {
+        "container": 53,
+        "host": 53,
+        "protocol": "tcp"
+      },
+      {
+        "container": 53,
+        "host": 53,
+        "protocol": "udp"
+      }
+    ],
+    "volumes": [
+      {
+        "container": "/etc/pihole",
+        "host": "./config/pihole"
+      },
+      {
+        "container": "/etc/dnsmasq.d",
+        "host": "./config/dnsmasq.d"
+      }
+    ],
+    "environment": {
+      "TZ": "America/New_York",
+      "WEBPASSWORD": "changeme",
+      "SERVERIP": "auto"
+    },
+    "restart": "unless-stopped",
+    "cap_add": ["NET_ADMIN"]
+  },
+  "config": {
+    "fields": [
+      {
+        "key": "web_password",
+        "label": "Web Interface Password",
+        "type": "password",
+        "required": true,
+        "description": "Password for Pi-hole admin interface"
+      },
+      {
+        "key": "web_port",
+        "label": "Web UI Port",
+        "type": "port",
+        "required": true,
+        "default": 8080
+      },
+      {
+        "key": "dns_port",
+        "label": "DNS Port",
+        "type": "port",
+        "required": true,
+        "default": 53
+      }
+    ]
+  }
+}

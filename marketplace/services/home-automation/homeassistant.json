@@ -7,7 +7,7 @@
   "longDescription": "Home Assistant is an open-source home automation platform that focuses on privacy and local control. It supports thousands of devices and services, allowing you to control all your devices from a single, mobile-friendly interface.",
   "category": "home-automation",
   "tags": ["smart-home", "automation", "iot", "privacy", "local-control", "zigbee", "z-wave"],
-  "icon": "homeassistant.svg",
+  "icon": "🏠",
   "homepage": "https://www.home-assistant.io",
   "repository": "https://github.com/home-assistant/core",
   "documentation": "https://www.home-assistant.io/docs",

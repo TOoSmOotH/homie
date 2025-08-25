@@ -2,6 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import { marketplaceService } from '../services/marketplace.service';
 import { ServiceDefinitionCategory } from '../models/ServiceDefinition';
 import { logger } from '../utils/logger';
+import { dbConnection } from '../database/connection';
+import { Service, ServiceStatus } from '../models/Service';
+import { AuthenticatedRequest } from '../middleware/auth.middleware';
 
 export class MarketplaceController {
   /**
@@ -204,7 +207,8 @@ export class MarketplaceController {
   installService = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { serviceId } = req.params;
-      const { config } = req.body;
+      const { name, config } = req.body;
+      const authReq = req as AuthenticatedRequest;
       
       // Get service definition
       const definition = await marketplaceService.getServiceDefinition(serviceId);
@@ -217,18 +221,49 @@ export class MarketplaceController {
         return;
       }
       
-      // TODO: Implement actual installation logic
-      // This would create a Service instance with the provided config
-      // and potentially start a Docker container
+      // Create a new service instance
+      const dataSource = dbConnection.getDataSource();
+      const serviceRepository = dataSource.getRepository(Service);
+      
+      // Check if a service with this name already exists for the user
+      const existingService = await serviceRepository.findOne({
+        where: {
+          name: name || definition.displayName,
+          user: { id: authReq.user?.id }
+        }
+      });
+      
+      if (existingService) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'A service with this name already exists' }
+        });
+        return;
+      }
+      
+      // Create the service instance
+      const service = serviceRepository.create({
+        name: name || definition.displayName,
+        description: definition.description,
+        status: ServiceStatus.UNKNOWN,
+        config: config || {},
+        user: { id: authReq.user?.id },
+        definition: definition
+      });
+      
+      // Save the service
+      const savedService = await serviceRepository.save(service);
+      
+      // Increment install count
+      definition.installCount = (definition.installCount || 0) + 1;
+      await dataSource.getRepository('ServiceDefinition').save(definition);
+      
+      logger.info(`Service ${definition.name} installed by user ${authReq.user?.username}`);
       
       res.json({
         success: true,
-        message: `Service ${definition.name} installation initiated`,
-        data: {
-          serviceId,
-          definition,
-          config
-        }
+        message: `Service ${definition.displayName} installed successfully`,
+        data: savedService
       });
     } catch (error) {
       logger.error('Error installing service:', error);

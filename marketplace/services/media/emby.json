@@ -1,0 +1,69 @@
+{
+  "id": "emby",
+  "name": "Emby",
+  "version": "4.8.0",
+  "author": "Emby LLC",
+  "description": "Personal media server with apps on every device",
+  "longDescription": "Emby brings together your personal videos, music, photos, and live television. Stream your media to devices throughout your home or on the go.",
+  "category": "media",
+  "tags": ["media", "streaming", "movies", "tv", "music", "photos"],
+  "icon": "📽️",
+  "homepage": "https://emby.media",
+  "documentation": "https://support.emby.media",
+  "license": "Proprietary",
+  "featured": false,
+  "official": true,
+  "requirements": {
+    "docker": true,
+    "minMemory": "1GB",
+    "minStorage": "5GB",
+    "ports": [8096]
+  },
+  "docker": {
+    "image": "emby/embyserver",
+    "tag": "latest",
+    "ports": [
+      {
+        "container": 8096,
+        "host": 8096,
+        "protocol": "tcp"
+      }
+    ],
+    "volumes": [
+      {
+        "container": "/config",
+        "host": "./config/emby"
+      },
+      {
+        "container": "/media",
+        "host": "./media",
+        "mode": "ro"
+      }
+    ],
+    "environment": {
+      "UID": "1000",
+      "GID": "1000",
+      "TZ": "America/New_York"
+    },
+    "restart": "unless-stopped",
+    "devices": ["/dev/dri"]
+  },
+  "config": {
+    "fields": [
+      {
+        "key": "port",
+        "label": "Web UI Port",
+        "type": "port",
+        "required": true,
+        "default": 8096
+      },
+      {
+        "key": "media_path",
+        "label": "Media Library Path",
+        "type": "path",
+        "required": true,
+        "placeholder": "/path/to/media"
+      }
+    ]
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "id": "sonarr",
+  "name": "Sonarr",
+  "version": "4.0.0",
+  "author": "Sonarr Team",
+  "description": "TV series collection manager for Usenet and BitTorrent users",
+  "longDescription": "Sonarr is a PVR for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new episodes of your favorite shows and will grab, sort and rename them.",
+  "category": "automation",
+  "tags": ["tv-shows", "automation", "download", "usenet", "torrent", "media-management"],
+  "icon": "📺",
+  "homepage": "https://sonarr.tv",
+  "repository": "https://github.com/Sonarr/Sonarr",
+  "documentation": "https://wiki.servarr.com/sonarr",
+  "license": "GPL-3.0",
+  "featured": true,
+  "official": true,
+  "requirements": {
+    "docker": true,
+    "minMemory": "512MB",
+    "minStorage": "1GB",
+    "ports": [8989]
+  },
+  "docker": {
+    "image": "linuxserver/sonarr",
+    "tag": "latest",
+    "ports": [
+      {
+        "container": 8989,
+        "host": 8989,
+        "protocol": "tcp"
+      }
+    ],
+    "volumes": [
+      {
+        "container": "/config",
+        "host": "./config/sonarr"
+      },
+      {
+        "container": "/tv",
+        "host": "./media/tv"
+      },
+      {
+        "container": "/downloads",
+        "host": "./downloads"
+      }
+    ],
+    "environment": {
+      "PUID": "1000",
+      "PGID": "1000",
+      "TZ": "America/New_York"
+    },
+    "restart": "unless-stopped"
+  },
+  "config": {
+    "fields": [
+      {
+        "key": "port",
+        "label": "Web UI Port",
+        "type": "port",
+        "required": true,
+        "default": 8989
+      },
+      {
+        "key": "tv_path",
+        "label": "TV Shows Path",
+        "type": "path",
+        "required": true,
+        "placeholder": "/path/to/tv"
+      },
+      {
+        "key": "downloads_path",
+        "label": "Downloads Path",
+        "type": "path",
+        "required": true,
+        "placeholder": "/path/to/downloads"
+      }
+    ]
+  }
+}

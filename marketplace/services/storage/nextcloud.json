@@ -1,0 +1,86 @@
+{
+  "id": "nextcloud",
+  "name": "Nextcloud",
+  "version": "28.0.1",
+  "author": "Nextcloud GmbH",
+  "description": "Self-hosted file sync, sharing and collaboration platform",
+  "longDescription": "Nextcloud is a suite of client-server software for creating and using file hosting services. It offers functionality similar to Dropbox, Google Drive, or OneDrive but can be hosted on your own server.",
+  "category": "storage",
+  "tags": ["cloud", "storage", "sync", "collaboration", "files", "calendar", "contacts"],
+  "icon": "☁️",
+  "homepage": "https://nextcloud.com",
+  "repository": "https://github.com/nextcloud/server",
+  "documentation": "https://docs.nextcloud.com",
+  "license": "AGPL-3.0",
+  "featured": true,
+  "official": true,
+  "requirements": {
+    "docker": true,
+    "minMemory": "512MB",
+    "minStorage": "10GB",
+    "ports": [8080]
+  },
+  "docker": {
+    "image": "nextcloud",
+    "tag": "latest",
+    "ports": [
+      {
+        "container": 80,
+        "host": 8080,
+        "protocol": "tcp"
+      }
+    ],
+    "volumes": [
+      {
+        "container": "/var/www/html",
+        "host": "./data/nextcloud"
+      },
+      {
+        "container": "/var/www/html/data",
+        "host": "./data/nextcloud-data"
+      }
+    ],
+    "environment": {
+      "MYSQL_HOST": "nextcloud-db",
+      "MYSQL_DATABASE": "nextcloud",
+      "MYSQL_USER": "nextcloud",
+      "MYSQL_PASSWORD": "changeme",
+      "NEXTCLOUD_ADMIN_USER": "admin",
+      "NEXTCLOUD_ADMIN_PASSWORD": "changeme",
+      "NEXTCLOUD_TRUSTED_DOMAINS": "localhost"
+    },
+    "restart": "unless-stopped"
+  },
+  "config": {
+    "fields": [
+      {
+        "key": "admin_user",
+        "label": "Admin Username",
+        "type": "text",
+        "required": true,
+        "default": "admin"
+      },
+      {
+        "key": "admin_password",
+        "label": "Admin Password",
+        "type": "password",
+        "required": true,
+        "description": "Strong password for admin account"
+      },
+      {
+        "key": "port",
+        "label": "Web UI Port",
+        "type": "port",
+        "required": true,
+        "default": 8080
+      },
+      {
+        "key": "data_path",
+        "label": "Data Storage Path",
+        "type": "path",
+        "required": true,
+        "placeholder": "/path/to/nextcloud/data"
+      }
+    ]
+  }
+}

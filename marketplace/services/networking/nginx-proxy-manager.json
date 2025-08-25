@@ -1,0 +1,91 @@
+{
+  "id": "nginx-proxy-manager",
+  "name": "Nginx Proxy Manager",
+  "version": "2.11.1",
+  "author": "Jamie Curnow",
+  "description": "Easy-to-use reverse proxy with SSL and Docker integration",
+  "longDescription": "Nginx Proxy Manager provides a web interface to easily manage Nginx reverse proxy configurations, SSL certificates with Let's Encrypt, and access control.",
+  "category": "networking",
+  "tags": ["reverse-proxy", "nginx", "ssl", "lets-encrypt", "proxy"],
+  "icon": "🔀",
+  "homepage": "https://nginxproxymanager.com",
+  "repository": "https://github.com/NginxProxyManager/nginx-proxy-manager",
+  "documentation": "https://nginxproxymanager.com/guide",
+  "license": "MIT",
+  "featured": true,
+  "official": true,
+  "requirements": {
+    "docker": true,
+    "minMemory": "256MB",
+    "minStorage": "250MB",
+    "ports": [80, 443, 81]
+  },
+  "docker": {
+    "image": "jc21/nginx-proxy-manager",
+    "tag": "latest",
+    "ports": [
+      {
+        "container": 80,
+        "host": 80,
+        "protocol": "tcp"
+      },
+      {
+        "container": 443,
+        "host": 443,
+        "protocol": "tcp"
+      },
+      {
+        "container": 81,
+        "host": 81,
+        "protocol": "tcp"
+      }
+    ],
+    "volumes": [
+      {
+        "container": "/data",
+        "host": "./data/npm"
+      },
+      {
+        "container": "/etc/letsencrypt",
+        "host": "./letsencrypt"
+      }
+    ],
+    "environment": {
+      "DB_SQLITE_FILE": "/data/database.sqlite"
+    },
+    "restart": "unless-stopped"
+  },
+  "config": {
+    "fields": [
+      {
+        "key": "admin_email",
+        "label": "Admin Email",
+        "type": "email",
+        "required": true,
+        "default": "admin@example.com",
+        "description": "Default admin email (password: changeme)"
+      },
+      {
+        "key": "http_port",
+        "label": "HTTP Port",
+        "type": "port",
+        "required": true,
+        "default": 80
+      },
+      {
+        "key": "https_port",
+        "label": "HTTPS Port",
+        "type": "port",
+        "required": true,
+        "default": 443
+      },
+      {
+        "key": "admin_port",
+        "label": "Admin UI Port",
+        "type": "port",
+        "required": true,
+        "default": 81
+      }
+    ]
+  }
+}

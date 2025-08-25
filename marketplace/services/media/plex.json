@@ -7,7 +7,7 @@
   "longDescription": "Plex organizes your video, music, and photo collections and streams them to all of your devices. With a Plex Media Server, you can stream your media to your phone, tablet, streaming device, game console, and more.",
   "category": "media",
   "tags": ["media", "streaming", "movies", "tv", "music", "photos"],
-  "icon": "plex.svg",
+  "icon": "🎬",
   "homepage": "https://www.plex.tv",
   "documentation": "https://support.plex.tv",
   "license": "Proprietary",

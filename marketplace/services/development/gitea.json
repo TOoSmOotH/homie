@@ -1,0 +1,87 @@
+{
+  "id": "gitea",
+  "name": "Gitea",
+  "version": "1.21.4",
+  "author": "Gitea",
+  "description": "Lightweight self-hosted Git service",
+  "longDescription": "Gitea is a painless self-hosted Git service. It is similar to GitHub, Bitbucket, and GitLab. Gitea is a fork of Gogs and is written in Go.",
+  "category": "development",
+  "tags": ["git", "version-control", "development", "collaboration", "code"],
+  "icon": "🐙",
+  "homepage": "https://gitea.io",
+  "repository": "https://github.com/go-gitea/gitea",
+  "documentation": "https://docs.gitea.io",
+  "license": "MIT",
+  "featured": false,
+  "official": true,
+  "requirements": {
+    "docker": true,
+    "minMemory": "256MB",
+    "minStorage": "500MB",
+    "ports": [3000, 22]
+  },
+  "docker": {
+    "image": "gitea/gitea",
+    "tag": "latest",
+    "ports": [
+      {
+        "container": 3000,
+        "host": 3000,
+        "protocol": "tcp"
+      },
+      {
+        "container": 22,
+        "host": 2222,
+        "protocol": "tcp"
+      }
+    ],
+    "volumes": [
+      {
+        "container": "/data",
+        "host": "./data/gitea"
+      },
+      {
+        "container": "/etc/timezone",
+        "host": "/etc/timezone",
+        "mode": "ro"
+      },
+      {
+        "container": "/etc/localtime",
+        "host": "/etc/localtime",
+        "mode": "ro"
+      }
+    ],
+    "environment": {
+      "USER_UID": "1000",
+      "USER_GID": "1000",
+      "GITEA__database__DB_TYPE": "sqlite3",
+      "GITEA__database__PATH": "/data/gitea.db"
+    },
+    "restart": "unless-stopped"
+  },
+  "config": {
+    "fields": [
+      {
+        "key": "web_port",
+        "label": "Web UI Port",
+        "type": "port",
+        "required": true,
+        "default": 3000
+      },
+      {
+        "key": "ssh_port",
+        "label": "SSH Port",
+        "type": "port",
+        "required": true,
+        "default": 2222
+      },
+      {
+        "key": "app_name",
+        "label": "Application Name",
+        "type": "text",
+        "required": true,
+        "default": "Gitea: Git with a cup of tea"
+      }
+    ]
+  }
+}

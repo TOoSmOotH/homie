@@ -1,0 +1,75 @@
+{
+  "id": "grafana",
+  "name": "Grafana",
+  "version": "10.3.1",
+  "author": "Grafana Labs",
+  "description": "Open source analytics and monitoring solution",
+  "longDescription": "Grafana is a multi-platform open source analytics and interactive visualization web application. It provides charts, graphs, and alerts for the web when connected to supported data sources.",
+  "category": "monitoring",
+  "tags": ["monitoring", "visualization", "metrics", "dashboards", "analytics"],
+  "icon": "📊",
+  "homepage": "https://grafana.com",
+  "repository": "https://github.com/grafana/grafana",
+  "documentation": "https://grafana.com/docs",
+  "license": "AGPL-3.0",
+  "featured": true,
+  "official": true,
+  "requirements": {
+    "docker": true,
+    "minMemory": "256MB",
+    "minStorage": "100MB",
+    "ports": [3000]
+  },
+  "docker": {
+    "image": "grafana/grafana",
+    "tag": "latest",
+    "ports": [
+      {
+        "container": 3000,
+        "host": 3000,
+        "protocol": "tcp"
+      }
+    ],
+    "volumes": [
+      {
+        "container": "/var/lib/grafana",
+        "host": "./data/grafana"
+      },
+      {
+        "container": "/etc/grafana",
+        "host": "./config/grafana"
+      }
+    ],
+    "environment": {
+      "GF_SECURITY_ADMIN_PASSWORD": "changeme",
+      "GF_INSTALL_PLUGINS": "grafana-clock-panel,grafana-simple-json-datasource"
+    },
+    "restart": "unless-stopped"
+  },
+  "config": {
+    "fields": [
+      {
+        "key": "admin_password",
+        "label": "Admin Password",
+        "type": "password",
+        "required": true,
+        "description": "Password for admin user"
+      },
+      {
+        "key": "port",
+        "label": "Web UI Port",
+        "type": "port",
+        "required": true,
+        "default": 3000
+      },
+      {
+        "key": "plugins",
+        "label": "Additional Plugins",
+        "type": "text",
+        "required": false,
+        "placeholder": "plugin1,plugin2",
+        "description": "Comma-separated list of plugins to install"
+      }
+    ]
+  }
+}

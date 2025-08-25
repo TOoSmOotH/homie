@@ -7,7 +7,7 @@
   "longDescription": "Jellyfin is a free and open-source media server and suite of multimedia applications designed to organize, manage, and share digital media files to networked devices. Unlike Plex, Jellyfin is completely free with no premium tiers.",
   "category": "media",
   "tags": ["media", "streaming", "open-source", "movies", "tv", "music", "free"],
-  "icon": "jellyfin.svg",
+  "icon": "🎥",
   "homepage": "https://jellyfin.org",
   "repository": "https://github.com/jellyfin/jellyfin",
   "documentation": "https://jellyfin.org/docs",
