@@ -223,7 +223,7 @@ export class MarketplaceService {
       logger.info(`Remote URL: ${this.config.remoteUrl}`);
       
       // Fetch marketplace metadata
-      const metadataUrl = `${this.config.remoteUrl}/marketplace.json`;
+      const metadataUrl = `${this.config.remoteUrl}/marketplace/marketplace.json`;
       const response = await axios.get(metadataUrl, {
         timeout: 30000,
         headers: {
@@ -235,9 +235,10 @@ export class MarketplaceService {
       
       logger.info(`Remote marketplace version: ${metadata.version}`);
       
-      // Sync each category
+      // Sync each category with its service list
       for (const category of metadata.categories) {
-        await this.syncCategory(category.id);
+        const serviceIds = metadata.services?.[category.id] || [];
+        await this.syncCategory(category.id, serviceIds);
       }
       
       // Update local marketplace metadata
@@ -259,33 +260,17 @@ export class MarketplaceService {
   /**
    * Sync a specific category from remote
    */
-  private async syncCategory(categoryId: string): Promise<void> {
+  private async syncCategory(categoryId: string, serviceIds?: string[]): Promise<void> {
     try {
       logger.info(`Syncing category: ${categoryId}`);
       
-      // Fetch the list of services in this category
-      const categoryUrl = `${this.config.remoteUrl}/services/${categoryId}`;
-      
-      try {
-        // Try to fetch the directory listing (won't work with raw GitHub, but good for other servers)
-        const response = await axios.get(categoryUrl, {
-          timeout: 10000,
-          headers: {
-            'Accept': 'application/json',
-            'User-Agent': 'Homie-Marketplace-Client/1.0'
-          }
-        });
-        
-        if (Array.isArray(response.data)) {
-          for (const serviceFile of response.data) {
-            if (serviceFile.endsWith('.json')) {
-              await this.syncServiceDefinition(categoryId, serviceFile);
-            }
-          }
+      // If service IDs are provided (from marketplace.json), use those
+      if (serviceIds && serviceIds.length > 0) {
+        for (const serviceId of serviceIds) {
+          await this.syncServiceDefinition(categoryId, `${serviceId}.json`);
         }
-      } catch (error) {
-        // For GitHub, we need to fetch individual files based on known service IDs
-        // This is a limitation of GitHub raw content serving
+      } else {
+        // Fallback to known services
         await this.syncKnownServices(categoryId);
       }
     } catch (error) {
@@ -321,7 +306,7 @@ export class MarketplaceService {
    */
   private async syncServiceDefinition(categoryId: string, filename: string): Promise<void> {
     try {
-      const serviceUrl = `${this.config.remoteUrl}/services/${categoryId}/${filename}`;
+      const serviceUrl = `${this.config.remoteUrl}/marketplace/services/${categoryId}/${filename}`;
       
       const response = await axios.get(serviceUrl, {
         timeout: 10000,

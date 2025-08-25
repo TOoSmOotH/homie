@@ -1,97 +1,51 @@
 {
   "version": "1.0.0",
-  "name": "Homie Service Marketplace",
-  "description": "Official marketplace for Homie homelab services",
-  "repository": "https://github.com/yourusername/homie",
-  "lastUpdated": "2025-08-24T00:00:00Z",
+  "name": "Homie Marketplace",
+  "description": "Official service marketplace for Homie homelab manager",
   "categories": [
     {
       "id": "media",
       "name": "Media & Entertainment",
-      "icon": "🎬",
-      "description": "Media servers, streaming, and entertainment services"
+      "icon": "🎬"
     },
     {
       "id": "automation",
       "name": "Automation",
-      "icon": "🤖",
-      "description": "Download automation, task scheduling, and workflow services"
+      "icon": "🤖"
     },
     {
       "id": "monitoring",
       "name": "Monitoring & Analytics",
-      "icon": "📊",
-      "description": "System monitoring, metrics, and analytics services"
+      "icon": "📊"
     },
     {
       "id": "networking",
       "name": "Networking",
-      "icon": "🌐",
-      "description": "DNS, VPN, proxy, and network management services"
+      "icon": "🌐"
     },
     {
       "id": "storage",
       "name": "Storage & Backup",
-      "icon": "💾",
-      "description": "File storage, sync, and backup services"
-    },
-    {
-      "id": "security",
-      "name": "Security",
-      "icon": "🔒",
-      "description": "Security, authentication, and privacy services"
-    },
-    {
-      "id": "development",
-      "name": "Development",
-      "icon": "👨‍💻",
-      "description": "Development tools, CI/CD, and version control"
-    },
-    {
-      "id": "productivity",
-      "name": "Productivity",
-      "icon": "📝",
-      "description": "Note-taking, project management, and collaboration"
-    },
-    {
-      "id": "communication",
-      "name": "Communication",
-      "icon": "💬",
-      "description": "Chat, email, and communication services"
-    },
-    {
-      "id": "gaming",
-      "name": "Gaming",
-      "icon": "🎮",
-      "description": "Game servers and gaming-related services"
+      "icon": "💾"
     },
     {
       "id": "home-automation",
       "name": "Home Automation",
-      "icon": "🏠",
-      "description": "Smart home and IoT services"
+      "icon": "🏠"
     },
     {
-      "id": "data",
-      "name": "Data & Databases",
-      "icon": "🗄️",
-      "description": "Databases, data processing, and analytics"
-    },
-    {
-      "id": "infrastructure",
-      "name": "Infrastructure",
-      "icon": "🏗️",
-      "description": "Container management, orchestration, and infrastructure"
-    },
-    {
-      "id": "other",
-      "name": "Other",
-      "icon": "📦",
-      "description": "Miscellaneous services"
+      "id": "development",
+      "name": "Development",
+      "icon": "👨‍💻"
     }
   ],
-  "stats": {
-    "totalServices": 0,
-    "lastSync": null
+  "services": {
+    "media": ["plex", "jellyfin", "emby"],
+    "automation": ["radarr", "sonarr"],
+    "monitoring": ["grafana"],
+    "networking": ["pihole", "nginx-proxy-manager"],
+    "storage": ["nextcloud"],
+    "home-automation": ["homeassistant"],
+    "development": ["gitea"]
   }
 }
