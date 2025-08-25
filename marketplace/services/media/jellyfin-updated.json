@@ -1,0 +1,175 @@
+{
+  "id": "jellyfin",
+  "name": "Jellyfin",
+  "version": "10.8.13",
+  "author": "Jellyfin Contributors",
+  "description": "Connect to your Jellyfin media server for monitoring and management",
+  "longDescription": "Integrate with your existing Jellyfin server to monitor activity, manage libraries, and control playback without leaving Homie.",
+  "category": "media",
+  "tags": ["media", "streaming", "open-source", "movies", "tv", "music"],
+  "icon": "🎥",
+  "homepage": "https://jellyfin.org",
+  "documentation": "https://jellyfin.org/docs",
+  "features": [
+    {
+      "id": "library_scan",
+      "name": "Library Management",
+      "description": "Scan and refresh media libraries",
+      "icon": "📚",
+      "capabilities": [
+        "Trigger library scans",
+        "View scan progress",
+        "Refresh metadata",
+        "Clean up missing files"
+      ]
+    },
+    {
+      "id": "recently_added",
+      "name": "Recent Media",
+      "description": "View recently added movies, shows, and music",
+      "icon": "🆕",
+      "capabilities": [
+        "List recent additions",
+        "Filter by media type",
+        "View metadata and artwork",
+        "Quick play links"
+      ]
+    },
+    {
+      "id": "active_sessions",
+      "name": "Active Sessions",
+      "description": "Monitor who's watching what in real-time",
+      "icon": "👥",
+      "capabilities": [
+        "View active streams",
+        "See playback progress",
+        "Monitor bandwidth usage",
+        "Remote control playback"
+      ]
+    },
+    {
+      "id": "user_management",
+      "name": "User Management",
+      "description": "Manage Jellyfin users and permissions",
+      "icon": "👤",
+      "capabilities": [
+        "View user list",
+        "Enable/disable users",
+        "Reset passwords",
+        "Manage library access"
+      ]
+    },
+    {
+      "id": "statistics",
+      "name": "Server Statistics",
+      "description": "View server performance and usage stats",
+      "icon": "📊",
+      "capabilities": [
+        "Playback statistics",
+        "Most watched content",
+        "User activity reports",
+        "Storage usage"
+      ]
+    },
+    {
+      "id": "scheduled_tasks",
+      "name": "Task Management",
+      "description": "View and control scheduled tasks",
+      "icon": "⏰",
+      "capabilities": [
+        "View task status",
+        "Run tasks manually",
+        "Configure schedules",
+        "View task history"
+      ]
+    }
+  ],
+  "connection": {
+    "type": "api",
+    "auth": "apikey",
+    "fields": [
+      {
+        "key": "url",
+        "label": "Jellyfin Server URL",
+        "type": "url",
+        "required": true,
+        "placeholder": "http://192.168.1.100:8096",
+        "description": "Full URL to your Jellyfin server"
+      },
+      {
+        "key": "api_key",
+        "label": "API Key",
+        "type": "password",
+        "required": true,
+        "description": "Generate from Jellyfin Dashboard > API Keys"
+      },
+      {
+        "key": "device_name",
+        "label": "Device Name",
+        "type": "text",
+        "required": false,
+        "default": "Homie",
+        "description": "How this connection appears in Jellyfin"
+      }
+    ]
+  },
+  "api": {
+    "endpoints": {
+      "health": "/System/Info/Public",
+      "libraries": "/Library/MediaFolders",
+      "refresh_library": "/Library/Refresh",
+      "recent_items": "/Users/{UserId}/Items/Latest",
+      "sessions": "/Sessions",
+      "users": "/Users",
+      "activity": "/System/ActivityLog/Entries",
+      "scheduled_tasks": "/ScheduledTasks",
+      "playback_info": "/Items/{ItemId}/PlaybackInfo"
+    }
+  },
+  "quickActions": [
+    {
+      "id": "scan_all",
+      "name": "Scan All Libraries",
+      "icon": "🔄",
+      "action": "api_call",
+      "endpoint": "/Library/Refresh"
+    },
+    {
+      "id": "view_sessions",
+      "name": "Active Sessions",
+      "icon": "👁️",
+      "action": "show_widget",
+      "widget": "active_sessions"
+    },
+    {
+      "id": "recent_media",
+      "name": "Recently Added",
+      "icon": "🆕",
+      "action": "show_widget",
+      "widget": "recent_additions"
+    }
+  ],
+  "widgets": [
+    {
+      "id": "active_sessions",
+      "name": "Now Playing",
+      "type": "realtime",
+      "refresh": 5000,
+      "size": "medium"
+    },
+    {
+      "id": "recent_additions",
+      "name": "Recently Added",
+      "type": "list",
+      "refresh": 60000,
+      "size": "large"
+    },
+    {
+      "id": "server_stats",
+      "name": "Server Statistics",
+      "type": "chart",
+      "refresh": 30000,
+      "size": "small"
+    }
+  ]
+}

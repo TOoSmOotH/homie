@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import MarketplaceServiceModal from '@/components/MarketplaceServiceModal';
 import axios from 'axios';
 import { 
   Server, 
@@ -23,7 +24,8 @@ import {
   Search,
   Filter,
   Grid3X3,
-  List
+  List,
+  Link2
 } from 'lucide-react';
 
 interface Service {
@@ -493,14 +495,11 @@ const Services: React.FC = () => {
                       size="sm"
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (confirm(`Install ${service.displayName}?`)) {
-                          installMutation.mutate(service.serviceId);
-                        }
+                        setSelectedMarketplaceService(service);
                       }}
-                      disabled={installMutation.isPending}
                     >
-                      <Download className="h-3 w-3 mr-1" />
-                      Install
+                      <Link2 className="h-3 w-3 mr-1" />
+                      Connect
                     </Button>
                   </div>
 
@@ -520,67 +519,15 @@ const Services: React.FC = () => {
 
       {/* Service Details Modal */}
       {selectedMarketplaceService && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center space-x-3">
-                  <div className="text-3xl">{selectedMarketplaceService.icon}</div>
-                  <div>
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                      {selectedMarketplaceService.displayName}
-                    </h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      v{selectedMarketplaceService.version} by {selectedMarketplaceService.author}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setSelectedMarketplaceService(null)}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                >
-                  ×
-                </button>
-              </div>
-
-              <p className="text-gray-600 dark:text-gray-300 mb-6">
-                {selectedMarketplaceService.description}
-              </p>
-
-              <div className="flex flex-wrap gap-2 mb-6">
-                {selectedMarketplaceService.tags.map((tag, idx) => (
-                  <span
-                    key={idx}
-                    className="text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-3 py-1 rounded-full"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-
-              <div className="flex items-center gap-4">
-                <Button
-                  onClick={() => {
-                    if (confirm(`Install ${selectedMarketplaceService.displayName}?`)) {
-                      installMutation.mutate(selectedMarketplaceService.serviceId);
-                      setSelectedMarketplaceService(null);
-                    }
-                  }}
-                  disabled={installMutation.isPending}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Install Service
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setSelectedMarketplaceService(null)}
-                >
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <MarketplaceServiceModal
+          service={selectedMarketplaceService as any}
+          onClose={() => setSelectedMarketplaceService(null)}
+          onConnect={(serviceId) => {
+            installMutation.mutate(serviceId);
+            setSelectedMarketplaceService(null);
+          }}
+          isConnecting={installMutation.isPending}
+        />
       )}
     </div>
   );
