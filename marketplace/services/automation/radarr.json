@@ -105,22 +105,62 @@
         "required": true,
         "description": "Found in Settings > General > Security"
       }
-    ]
+    ],
+    "testEndpoint": {
+      "path": "/api/v3/system/status",
+      "method": "GET",
+      "headers": {
+        "X-Api-Key": "{api_key}"
+      },
+      "expectedStatus": 200,
+      "successIndicator": "version"
+    }
   },
   "api": {
+    "baseUrl": "{url}",
     "headers": {
       "X-Api-Key": "{api_key}"
     },
     "endpoints": {
-      "movies": "/api/v3/movie",
-      "queue": "/api/v3/queue",
-      "calendar": "/api/v3/calendar",
-      "history": "/api/v3/history",
-      "wanted": "/api/v3/wanted/missing",
-      "system_status": "/api/v3/system/status",
-      "health": "/api/v3/health",
-      "quality_profiles": "/api/v3/qualityprofile",
-      "indexer_stats": "/api/v3/indexer/stats"
+      "queue": {
+        "path": "/api/v3/queue",
+        "method": "GET",
+        "refresh": 10000,
+        "transform": "response.records"
+      },
+      "calendar": {
+        "path": "/api/v3/calendar",
+        "method": "GET",
+        "params": {
+          "start": "{startDate}",
+          "end": "{endDate}"
+        },
+        "refresh": 3600000
+      },
+      "missing": {
+        "path": "/api/v3/wanted/missing",
+        "method": "GET",
+        "params": {
+          "pageSize": 1
+        },
+        "transform": "response.totalRecords",
+        "refresh": 60000
+      },
+      "status": {
+        "path": "/api/v3/system/status",
+        "method": "GET",
+        "refresh": 30000
+      },
+      "movies": {
+        "path": "/api/v3/movie",
+        "method": "GET",
+        "cache": 300000
+      },
+      "health": {
+        "path": "/api/v3/health",
+        "method": "GET",
+        "refresh": 60000
+      }
     }
   },
   "quickActions": [
@@ -128,50 +168,104 @@
       "id": "search_missing",
       "name": "Search Missing Movies",
       "icon": "🔍",
-      "action": "api_call",
-      "endpoint": "/api/v3/command",
-      "payload": {"name": "MissingMoviesSearch"}
+      "confirm": true,
+      "api": {
+        "endpoint": "/api/v3/command",
+        "method": "POST",
+        "body": {"name": "MissingMoviesSearch"}
+      }
     },
     {
-      "id": "rss_sync",
+      "id": "rss_sync", 
       "name": "RSS Sync",
       "icon": "🔄",
-      "action": "api_call",
-      "endpoint": "/api/v3/command",
-      "payload": {"name": "RssSync"}
+      "confirm": false,
+      "api": {
+        "endpoint": "/api/v3/command",
+        "method": "POST",
+        "body": {"name": "RssSync"}
+      }
     },
     {
       "id": "backup",
       "name": "Backup Database",
       "icon": "💾",
-      "action": "api_call",
-      "endpoint": "/api/v3/command",
-      "payload": {"name": "Backup"}
+      "confirm": true,
+      "api": {
+        "endpoint": "/api/v3/command",
+        "method": "POST",
+        "body": {"name": "Backup"}
+      }
     }
   ],
   "widgets": [
     {
       "id": "download_queue",
-      "name": "Active Downloads",
+      "name": "Download Queue",
       "type": "list",
-      "refresh": 10000,
-      "size": "medium"
+      "icon": "📥",
+      "size": "medium",
+      "dataSource": "queue",
+      "display": {
+        "itemTemplate": {
+          "title": "{title}",
+          "subtitle": "{status} - {sizeleft|filesize} left",
+          "progress": "{progress}"
+        },
+        "emptyMessage": "No active downloads",
+        "maxItems": 5
+      }
     },
     {
       "id": "upcoming_movies",
       "name": "Coming Soon",
-      "type": "calendar",
-      "refresh": 3600000,
-      "size": "large"
+      "type": "list",
+      "icon": "📅",
+      "size": "large",
+      "dataSource": "calendar",
+      "display": {
+        "itemTemplate": {
+          "title": "{title} ({year})",
+          "subtitle": "{inCinemas|date}"
+        },
+        "emptyMessage": "No upcoming movies",
+        "maxItems": 10
+      }
     },
     {
-      "id": "missing_movies",
+      "id": "missing_counter",
       "name": "Missing Movies",
-      "type": "counter",
-      "refresh": 60000,
-      "size": "small"
+      "type": "stat",
+      "icon": "🎬",
+      "size": "small",
+      "dataSource": "missing",
+      "display": {
+        "value": "{data}",
+        "label": "Missing Movies",
+        "color": "warning"
+      }
+    },
+    {
+      "id": "system_status",
+      "name": "System Status",
+      "type": "info",
+      "icon": "ℹ️",
+      "size": "small",
+      "dataSource": ["status", "movies", "health"],
+      "display": {
+        "fields": [
+          { "label": "Version", "value": "{status.version}" },
+          { "label": "Movies", "value": "{movies.length}" },
+          { "label": "Health", "value": "{health|healthStatus}" }
+        ]
+      }
     }
   ],
+  "transformers": {
+    "filesize": "function(bytes) { return (bytes / 1024 / 1024).toFixed(2) + ' MB'; }",
+    "date": "function(dateStr) { return new Date(dateStr).toLocaleDateString(); }",
+    "healthStatus": "function(health) { return health && health.length > 0 ? health.length + ' issues' : 'Healthy'; }"
+  },
   "settings": {
     "sections": [
       {

@@ -292,29 +292,10 @@ const ServiceSettingsModal: React.FC<Props> = ({ service, onClose }) => {
     ...(service.definition?.settings?.sections || [])
   ];
 
-  if (!allSections.length) {
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <span className="text-2xl">{service.definition?.icon || '⚙️'}</span>
-              {service.name} Settings
-            </h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-            >
-              <X className="h-6 w-6" />
-            </button>
-          </div>
-          <p className="text-gray-500 dark:text-gray-400">
-            No settings available for this service.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  // Debug logging
+  console.log('ServiceSettingsModal - Service:', service);
+  console.log('ServiceSettingsModal - Definition:', service.definition);
+  console.log('ServiceSettingsModal - All sections:', allSections);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">

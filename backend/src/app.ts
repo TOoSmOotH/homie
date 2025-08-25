@@ -12,6 +12,7 @@ import { servicesRoutes } from './routes/services.routes';
 import { configRoutes } from './routes/config.routes';
 import { dashboardRoutes } from './routes/dashboard.routes';
 import { marketplaceRoutes } from './routes/marketplace.routes';
+import serviceDataRoutes from './routes/service-data.routes';
 import { logger } from './utils/logger';
 import { config } from './config';
 
@@ -66,6 +67,7 @@ app.use(`${config.apiPrefix}/services`, authenticateToken, servicesRoutes);
 app.use(`${config.apiPrefix}/config`, authenticateToken, configRoutes);
 app.use(`${config.apiPrefix}/dashboard`, authenticateToken, dashboardRoutes);
 app.use(`${config.apiPrefix}/marketplace`, authenticateToken, marketplaceRoutes);
+app.use(`${config.apiPrefix}`, serviceDataRoutes); // Generic service data routes
 
 // Health check endpoint (no auth required)
 app.get(`${config.apiPrefix}/health`, (req, res) => {
