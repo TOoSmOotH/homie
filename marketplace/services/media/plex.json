@@ -3,167 +3,189 @@
   "name": "Plex Media Server",
   "version": "1.32.8",
   "author": "Plex Inc.",
-  "description": "Stream your media collection to any device, anywhere",
-  "longDescription": "Plex organizes your video, music, and photo collections and streams them to all of your devices. With a Plex Media Server, you can stream your media to your phone, tablet, streaming device, game console, and more.",
+  "description": "Connect to your Plex Media Server for monitoring and management",
+  "longDescription": "Integrate with your existing Plex server to monitor activity, manage libraries, view statistics, and control your media server from Homie.",
   "category": "media",
   "tags": ["media", "streaming", "movies", "tv", "music", "photos"],
   "icon": "🎬",
   "homepage": "https://www.plex.tv",
   "documentation": "https://support.plex.tv",
-  "license": "Proprietary",
-  "featured": true,
-  "official": true,
-  "requirements": {
-    "docker": true,
-    "minMemory": "2GB",
-    "minStorage": "10GB",
-    "ports": [32400]
-  },
-  "docker": {
-    "image": "plexinc/pms-docker",
-    "tag": "latest",
-    "ports": [
-      {
-        "container": 32400,
-        "host": 32400,
-        "protocol": "tcp"
-      }
-    ],
-    "volumes": [
-      {
-        "container": "/config",
-        "host": "./config/plex"
-      },
-      {
-        "container": "/data",
-        "host": "./media",
-        "mode": "ro"
-      },
-      {
-        "container": "/transcode",
-        "host": "./transcode"
-      }
-    ],
-    "environment": {
-      "PLEX_UID": "1000",
-      "PLEX_GID": "1000",
-      "TZ": "America/New_York",
-      "VERSION": "docker"
+  "features": [
+    {
+      "id": "library_management",
+      "name": "Library Management",
+      "description": "Manage and scan Plex libraries",
+      "icon": "📚",
+      "capabilities": [
+        "Scan individual libraries",
+        "Analyze media files",
+        "Refresh metadata",
+        "Empty trash",
+        "Optimize database"
+      ]
     },
-    "restart": "unless-stopped",
-    "devices": ["/dev/dri"]
-  },
-  "config": {
+    {
+      "id": "now_playing",
+      "name": "Activity Monitor",
+      "description": "Real-time monitoring of active streams",
+      "icon": "▶️",
+      "capabilities": [
+        "View active sessions",
+        "Monitor transcoding",
+        "Track bandwidth usage",
+        "Stop streams remotely",
+        "Send messages to users"
+      ]
+    },
+    {
+      "id": "recently_added",
+      "name": "Recent Content",
+      "description": "Track newly added media",
+      "icon": "🆕",
+      "capabilities": [
+        "View recent additions",
+        "Filter by library",
+        "See metadata",
+        "Download posters"
+      ]
+    },
+    {
+      "id": "plexpass_features",
+      "name": "Plex Pass Features",
+      "description": "Premium features for Plex Pass users",
+      "icon": "⭐",
+      "capabilities": [
+        "Sync status",
+        "DVR management",
+        "Live TV guide",
+        "Hardware transcoding stats"
+      ]
+    },
+    {
+      "id": "statistics",
+      "name": "Server Statistics",
+      "description": "Detailed server and usage statistics",
+      "icon": "📊",
+      "capabilities": [
+        "Watch history",
+        "Most played content",
+        "User statistics",
+        "Server performance",
+        "Storage analytics"
+      ]
+    },
+    {
+      "id": "user_management",
+      "name": "User & Sharing",
+      "description": "Manage users and library sharing",
+      "icon": "👥",
+      "capabilities": [
+        "Manage home users",
+        "Control library access",
+        "Invite friends",
+        "Manage devices",
+        "View user activity"
+      ]
+    }
+  ],
+  "connection": {
+    "type": "api",
+    "auth": "token",
     "fields": [
       {
-        "key": "claim_token",
-        "label": "Claim Token",
-        "type": "text",
-        "required": false,
-        "placeholder": "claim-xxxxxxxxxxxx",
-        "description": "Get your claim token from https://www.plex.tv/claim (optional for initial setup)"
+        "key": "url",
+        "label": "Plex Server URL",
+        "type": "url",
+        "required": true,
+        "placeholder": "http://192.168.1.100:32400",
+        "description": "Local URL to your Plex server"
       },
       {
-        "key": "hostname",
+        "key": "token",
+        "label": "X-Plex-Token",
+        "type": "password",
+        "required": true,
+        "description": "Find in Plex Web App > Settings > Authorized Devices > View XML"
+      },
+      {
+        "key": "server_name",
         "label": "Server Name",
         "type": "text",
-        "required": true,
-        "default": "PlexServer",
-        "description": "Name for your Plex server"
-      },
-      {
-        "key": "port",
-        "label": "Web UI Port",
-        "type": "port",
-        "required": true,
-        "default": 32400,
-        "validation": {
-          "min": 1024,
-          "max": 65535
-        }
-      },
-      {
-        "key": "media_path",
-        "label": "Media Library Path",
-        "type": "path",
-        "required": true,
-        "placeholder": "/path/to/media",
-        "description": "Path to your media files"
-      },
-      {
-        "key": "transcode_path",
-        "label": "Transcode Path",
-        "type": "path",
         "required": false,
-        "placeholder": "/path/to/transcode",
-        "description": "Path for temporary transcoding files (optional, uses RAM if not set)"
-      },
-      {
-        "key": "hardware_acceleration",
-        "label": "Enable Hardware Acceleration",
-        "type": "boolean",
-        "required": false,
-        "default": false,
-        "description": "Enable GPU hardware acceleration for transcoding (requires compatible GPU)"
-      },
-      {
-        "key": "timezone",
-        "label": "Timezone",
-        "type": "select",
-        "required": true,
-        "default": "America/New_York",
-        "options": [
-          { "value": "America/New_York", "label": "Eastern Time" },
-          { "value": "America/Chicago", "label": "Central Time" },
-          { "value": "America/Denver", "label": "Mountain Time" },
-          { "value": "America/Los_Angeles", "label": "Pacific Time" },
-          { "value": "Europe/London", "label": "GMT/London" },
-          { "value": "Europe/Paris", "label": "Central European Time" },
-          { "value": "Asia/Tokyo", "label": "Japan Time" },
-          { "value": "Australia/Sydney", "label": "Sydney Time" }
-        ]
+        "description": "Friendly name for this server"
       }
     ]
   },
   "api": {
-    "baseUrlPattern": "http://{host}:{port}",
-    "authType": "custom",
+    "headers": {
+      "X-Plex-Token": "{token}",
+      "Accept": "application/json"
+    },
     "endpoints": {
-      "health": "/identity",
-      "test": "/identity"
+      "identity": "/identity",
+      "libraries": "/library/sections",
+      "library_scan": "/library/sections/{id}/refresh",
+      "sessions": "/status/sessions",
+      "recently_added": "/library/recentlyAdded",
+      "on_deck": "/library/onDeck",
+      "statistics": "/statistics/media",
+      "activities": "/activities",
+      "transcode_sessions": "/transcode/sessions",
+      "playlists": "/playlists",
+      "butler_tasks": "/butler"
     }
   },
   "quickActions": [
     {
-      "id": "open_web",
-      "name": "Open Web UI",
-      "icon": "🌐",
-      "action": "open_url",
-      "config": {
-        "url": "http://{host}:{port}/web"
-      }
+      "id": "scan_all",
+      "name": "Scan All Libraries",
+      "icon": "🔄",
+      "action": "api_call",
+      "endpoint": "/library/sections/all/refresh"
     },
     {
-      "id": "manage_libraries",
-      "name": "Manage Libraries",
-      "icon": "📚",
-      "action": "open_url",
-      "config": {
-        "url": "http://{host}:{port}/web/index.html#!/settings/server/manage-library"
-      }
+      "id": "view_activity",
+      "name": "Current Activity",
+      "icon": "📊",
+      "action": "show_widget",
+      "widget": "now_playing"
+    },
+    {
+      "id": "optimize_db",
+      "name": "Optimize Database",
+      "icon": "⚡",
+      "action": "api_call",
+      "endpoint": "/butler/OptimizeDatabase"
     }
   ],
-  "setupSteps": [
-    "Container will be created with your specified configuration",
-    "Access Plex Web UI at http://your-server:32400/web",
-    "Sign in with your Plex account",
-    "Add your media libraries",
-    "Configure remote access if desired",
-    "Install Plex apps on your devices"
-  ],
-  "screenshots": [
-    "plex-dashboard.png",
-    "plex-library.png",
-    "plex-player.png"
+  "widgets": [
+    {
+      "id": "now_playing",
+      "name": "Now Playing",
+      "type": "realtime",
+      "refresh": 5000,
+      "size": "medium"
+    },
+    {
+      "id": "recent_additions",
+      "name": "Recently Added",
+      "type": "grid",
+      "refresh": 60000,
+      "size": "large"
+    },
+    {
+      "id": "server_health",
+      "name": "Server Health",
+      "type": "status",
+      "refresh": 30000,
+      "size": "small"
+    },
+    {
+      "id": "transcode_activity",
+      "name": "Transcoding",
+      "type": "gauge",
+      "refresh": 5000,
+      "size": "small"
+    }
   ]
 }

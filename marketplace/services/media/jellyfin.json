@@ -3,165 +3,391 @@
   "name": "Jellyfin",
   "version": "10.8.13",
   "author": "Jellyfin Contributors",
-  "description": "The free and open-source media server",
-  "longDescription": "Jellyfin is a free and open-source media server and suite of multimedia applications designed to organize, manage, and share digital media files to networked devices. Unlike Plex, Jellyfin is completely free with no premium tiers.",
+  "description": "Connect to your Jellyfin media server for monitoring and management",
+  "longDescription": "Integrate with your existing Jellyfin server to monitor activity, manage libraries, and control playback without leaving Homie.",
   "category": "media",
-  "tags": ["media", "streaming", "open-source", "movies", "tv", "music", "free"],
+  "tags": ["media", "streaming", "open-source", "movies", "tv", "music"],
   "icon": "🎥",
   "homepage": "https://jellyfin.org",
-  "repository": "https://github.com/jellyfin/jellyfin",
   "documentation": "https://jellyfin.org/docs",
-  "license": "GPL-2.0",
-  "featured": true,
-  "official": true,
-  "requirements": {
-    "docker": true,
-    "minMemory": "1GB",
-    "minStorage": "5GB",
-    "ports": [8096, 8920]
-  },
-  "docker": {
-    "image": "jellyfin/jellyfin",
-    "tag": "latest",
-    "ports": [
-      {
-        "container": 8096,
-        "host": 8096,
-        "protocol": "tcp"
-      },
-      {
-        "container": 8920,
-        "host": 8920,
-        "protocol": "tcp"
-      }
-    ],
-    "volumes": [
-      {
-        "container": "/config",
-        "host": "./config/jellyfin"
-      },
-      {
-        "container": "/media",
-        "host": "./media",
-        "mode": "ro"
-      },
-      {
-        "container": "/cache",
-        "host": "./cache/jellyfin"
-      }
-    ],
-    "environment": {
-      "JELLYFIN_PublishedServerUrl": "http://{host}:8096"
+  "features": [
+    {
+      "id": "library_scan",
+      "name": "Library Management",
+      "description": "Scan and refresh media libraries",
+      "icon": "📚",
+      "capabilities": [
+        "Trigger library scans",
+        "View scan progress",
+        "Refresh metadata",
+        "Clean up missing files"
+      ]
     },
-    "restart": "unless-stopped",
-    "devices": ["/dev/dri"]
-  },
-  "config": {
+    {
+      "id": "recently_added",
+      "name": "Recent Media",
+      "description": "View recently added movies, shows, and music",
+      "icon": "🆕",
+      "capabilities": [
+        "List recent additions",
+        "Filter by media type",
+        "View metadata and artwork",
+        "Quick play links"
+      ]
+    },
+    {
+      "id": "active_sessions",
+      "name": "Active Sessions",
+      "description": "Monitor who's watching what in real-time",
+      "icon": "👥",
+      "capabilities": [
+        "View active streams",
+        "See playback progress",
+        "Monitor bandwidth usage",
+        "Remote control playback"
+      ]
+    },
+    {
+      "id": "user_management",
+      "name": "User Management",
+      "description": "Manage Jellyfin users and permissions",
+      "icon": "👤",
+      "capabilities": [
+        "View user list",
+        "Enable/disable users",
+        "Reset passwords",
+        "Manage library access"
+      ]
+    }
+  ],
+  "connection": {
+    "type": "api",
+    "auth": "apikey",
     "fields": [
       {
-        "key": "server_name",
-        "label": "Server Name",
+        "key": "url",
+        "label": "Jellyfin Server URL",
+        "type": "url",
+        "required": true,
+        "placeholder": "http://192.168.1.100:8096",
+        "description": "Full URL to your Jellyfin server"
+      },
+      {
+        "key": "api_key",
+        "label": "API Key",
+        "type": "password",
+        "required": true,
+        "description": "Generate from Jellyfin Dashboard > API Keys"
+      },
+      {
+        "key": "device_name",
+        "label": "Device Name",
         "type": "text",
-        "required": true,
-        "default": "Jellyfin",
-        "description": "Name for your Jellyfin server"
-      },
-      {
-        "key": "http_port",
-        "label": "HTTP Port",
-        "type": "port",
-        "required": true,
-        "default": 8096,
-        "validation": {
-          "min": 1024,
-          "max": 65535
-        }
-      },
-      {
-        "key": "https_port",
-        "label": "HTTPS Port",
-        "type": "port",
         "required": false,
-        "default": 8920,
-        "validation": {
-          "min": 1024,
-          "max": 65535
-        }
-      },
-      {
-        "key": "media_path",
-        "label": "Media Library Path",
-        "type": "path",
-        "required": true,
-        "placeholder": "/path/to/media",
-        "description": "Path to your media files"
-      },
-      {
-        "key": "cache_path",
-        "label": "Cache Path",
-        "type": "path",
-        "required": false,
-        "placeholder": "/path/to/cache",
-        "description": "Path for cache and temporary files"
-      },
-      {
-        "key": "hardware_acceleration",
-        "label": "Enable Hardware Acceleration",
-        "type": "boolean",
-        "required": false,
-        "default": false,
-        "description": "Enable GPU hardware acceleration for transcoding"
-      },
-      {
-        "key": "enable_https",
-        "label": "Enable HTTPS",
-        "type": "boolean",
-        "required": false,
-        "default": false,
-        "description": "Enable HTTPS access (requires SSL certificate)"
+        "default": "Homie",
+        "description": "How this connection appears in Jellyfin"
       }
     ]
   },
+  "settings": {
+    "sections": [
+      {
+        "id": "display",
+        "name": "Display Settings",
+        "icon": "🖼️",
+        "fields": [
+          {
+            "key": "show_on_dashboard",
+            "label": "Show on Dashboard",
+            "type": "boolean",
+            "default": true,
+            "description": "Display Jellyfin widgets on the main dashboard"
+          },
+          {
+            "key": "dashboard_position",
+            "label": "Dashboard Position",
+            "type": "select",
+            "default": "auto",
+            "options": [
+              {"value": "auto", "label": "Automatic"},
+              {"value": "top", "label": "Top"},
+              {"value": "middle", "label": "Middle"},
+              {"value": "bottom", "label": "Bottom"}
+            ]
+          },
+          {
+            "key": "recent_items_count",
+            "label": "Recent Items to Show",
+            "type": "number",
+            "default": 10,
+            "min": 5,
+            "max": 50,
+            "description": "Number of recent items to display"
+          },
+          {
+            "key": "show_poster_images",
+            "label": "Show Poster Images",
+            "type": "boolean",
+            "default": true,
+            "description": "Display movie/show poster images"
+          },
+          {
+            "key": "image_quality",
+            "label": "Image Quality",
+            "type": "select",
+            "default": "medium",
+            "options": [
+              {"value": "low", "label": "Low (Fast Loading)"},
+              {"value": "medium", "label": "Medium (Balanced)"},
+              {"value": "high", "label": "High (Best Quality)"}
+            ]
+          }
+        ]
+      },
+      {
+        "id": "monitoring",
+        "name": "Monitoring Settings",
+        "icon": "📊",
+        "fields": [
+          {
+            "key": "enable_session_monitoring",
+            "label": "Monitor Active Sessions",
+            "type": "boolean",
+            "default": true,
+            "description": "Track and display active streaming sessions"
+          },
+          {
+            "key": "session_refresh_interval",
+            "label": "Session Refresh Interval",
+            "type": "select",
+            "default": "5",
+            "options": [
+              {"value": "5", "label": "5 seconds"},
+              {"value": "10", "label": "10 seconds"},
+              {"value": "30", "label": "30 seconds"},
+              {"value": "60", "label": "1 minute"}
+            ],
+            "description": "How often to update active sessions"
+          },
+          {
+            "key": "show_bandwidth_usage",
+            "label": "Show Bandwidth Usage",
+            "type": "boolean",
+            "default": true,
+            "description": "Display bandwidth usage for active streams"
+          },
+          {
+            "key": "show_transcoding_info",
+            "label": "Show Transcoding Info",
+            "type": "boolean",
+            "default": true,
+            "description": "Display if streams are being transcoded"
+          }
+        ]
+      },
+      {
+        "id": "notifications",
+        "name": "Notification Settings",
+        "icon": "🔔",
+        "fields": [
+          {
+            "key": "notify_new_content",
+            "label": "New Content Notifications",
+            "type": "boolean",
+            "default": false,
+            "description": "Get notified when new content is added"
+          },
+          {
+            "key": "notify_user_activity",
+            "label": "User Activity Notifications",
+            "type": "boolean",
+            "default": false,
+            "description": "Alert when users start/stop streaming"
+          },
+          {
+            "key": "notify_server_issues",
+            "label": "Server Issue Alerts",
+            "type": "boolean",
+            "default": true,
+            "description": "Alert on server problems or downtime"
+          }
+        ]
+      },
+      {
+        "id": "library",
+        "name": "Library Settings",
+        "icon": "📚",
+        "fields": [
+          {
+            "key": "auto_scan_enabled",
+            "label": "Enable Auto Library Scan",
+            "type": "boolean",
+            "default": false,
+            "description": "Automatically scan libraries periodically"
+          },
+          {
+            "key": "scan_schedule",
+            "label": "Scan Schedule",
+            "type": "select",
+            "default": "daily",
+            "options": [
+              {"value": "hourly", "label": "Every Hour"},
+              {"value": "daily", "label": "Daily"},
+              {"value": "weekly", "label": "Weekly"},
+              {"value": "manual", "label": "Manual Only"}
+            ],
+            "depends_on": "auto_scan_enabled",
+            "show_if": true
+          },
+          {
+            "key": "libraries_to_monitor",
+            "label": "Libraries to Monitor",
+            "type": "multiselect",
+            "default": ["all"],
+            "options": "dynamic",
+            "description": "Select which libraries to monitor"
+          }
+        ]
+      }
+    ]
+  },
+  "dashboard": {
+    "widgets": [
+      {
+        "id": "now_playing",
+        "name": "Now Playing",
+        "description": "Currently active streams",
+        "type": "realtime_list",
+        "size": "medium",
+        "refresh": 5000,
+        "data_source": "/Sessions",
+        "display": {
+          "show_user": true,
+          "show_device": true,
+          "show_progress": true,
+          "show_quality": true,
+          "show_bandwidth": true
+        }
+      },
+      {
+        "id": "recent_additions",
+        "name": "Recently Added",
+        "description": "Latest content added to libraries",
+        "type": "media_grid",
+        "size": "large",
+        "refresh": 60000,
+        "data_source": "/Users/{UserId}/Items/Latest",
+        "display": {
+          "items_per_row": 5,
+          "show_title": true,
+          "show_year": true,
+          "show_rating": false,
+          "show_runtime": false,
+          "hover_details": true
+        }
+      },
+      {
+        "id": "server_stats",
+        "name": "Server Statistics",
+        "description": "Server performance metrics",
+        "type": "stats_card",
+        "size": "small",
+        "refresh": 30000,
+        "metrics": [
+          {
+            "id": "total_movies",
+            "label": "Movies",
+            "icon": "🎬",
+            "data_source": "/Items/Counts"
+          },
+          {
+            "id": "total_shows",
+            "label": "TV Shows",
+            "icon": "📺",
+            "data_source": "/Items/Counts"
+          },
+          {
+            "id": "total_episodes",
+            "label": "Episodes",
+            "icon": "📼",
+            "data_source": "/Items/Counts"
+          },
+          {
+            "id": "active_users",
+            "label": "Active Users",
+            "icon": "👥",
+            "data_source": "/Sessions"
+          }
+        ]
+      },
+      {
+        "id": "library_health",
+        "name": "Library Health",
+        "description": "Library scan status and health",
+        "type": "status_list",
+        "size": "small",
+        "refresh": 60000,
+        "data_source": "/Library/MediaFolders",
+        "display": {
+          "show_last_scan": true,
+          "show_item_count": true,
+          "show_size": false
+        }
+      }
+    ],
+    "layout": {
+      "default": [
+        {"widget": "now_playing", "position": {"x": 0, "y": 0, "w": 6, "h": 3}},
+        {"widget": "server_stats", "position": {"x": 6, "y": 0, "w": 3, "h": 3}},
+        {"widget": "library_health", "position": {"x": 9, "y": 0, "w": 3, "h": 3}},
+        {"widget": "recent_additions", "position": {"x": 0, "y": 3, "w": 12, "h": 4}}
+      ],
+      "compact": [
+        {"widget": "now_playing", "position": {"x": 0, "y": 0, "w": 12, "h": 2}},
+        {"widget": "recent_additions", "position": {"x": 0, "y": 2, "w": 12, "h": 3}}
+      ]
+    }
+  },
   "api": {
-    "baseUrlPattern": "http://{host}:{port}",
-    "authType": "apikey",
-    "apiKeyField": "api_key",
+    "headers": {
+      "X-MediaBrowser-Token": "{api_key}",
+      "X-Emby-Authorization": "MediaBrowser Client=\"Homie\", Device=\"{device_name}\", DeviceId=\"homie-{instance_id}\", Version=\"1.0.0\""
+    },
     "endpoints": {
-      "health": "/health",
-      "test": "/System/Info/Public"
+      "health": "/System/Info/Public",
+      "libraries": "/Library/MediaFolders",
+      "refresh_library": "/Library/Refresh",
+      "recent_items": "/Users/{UserId}/Items/Latest",
+      "sessions": "/Sessions",
+      "users": "/Users",
+      "activity": "/System/ActivityLog/Entries",
+      "scheduled_tasks": "/ScheduledTasks",
+      "playback_info": "/Items/{ItemId}/PlaybackInfo",
+      "items_counts": "/Items/Counts"
     }
   },
   "quickActions": [
     {
-      "id": "open_web",
-      "name": "Open Web UI",
-      "icon": "🌐",
-      "action": "open_url",
-      "config": {
-        "url": "http://{host}:{port}"
-      }
+      "id": "scan_all",
+      "name": "Scan All Libraries",
+      "icon": "🔄",
+      "action": "api_call",
+      "endpoint": "/Library/Refresh",
+      "confirmation": "Scan all media libraries now?"
     },
     {
-      "id": "admin_dashboard",
-      "name": "Admin Dashboard",
-      "icon": "⚙️",
-      "action": "open_url",
-      "config": {
-        "url": "http://{host}:{port}/web/index.html#!/dashboard"
-      }
+      "id": "view_sessions",
+      "name": "Active Sessions",
+      "icon": "👁️",
+      "action": "show_widget",
+      "widget": "now_playing"
+    },
+    {
+      "id": "recent_media",
+      "name": "Recently Added",
+      "icon": "🆕",
+      "action": "show_widget",
+      "widget": "recent_additions"
     }
-  ],
-  "setupSteps": [
-    "Container will be created with your specified configuration",
-    "Access Jellyfin at http://your-server:8096",
-    "Complete the setup wizard",
-    "Create your admin account",
-    "Add your media libraries",
-    "Install Jellyfin apps on your devices"
-  ],
-  "screenshots": [
-    "jellyfin-home.png",
-    "jellyfin-library.png",
-    "jellyfin-player.png"
   ]
 }

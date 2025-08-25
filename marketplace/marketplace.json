@@ -40,12 +40,32 @@
     }
   ],
   "services": {
-    "media": ["plex", "jellyfin", "emby"],
-    "automation": ["radarr", "sonarr"],
-    "monitoring": ["grafana"],
-    "networking": ["pihole", "nginx-proxy-manager"],
-    "storage": ["nextcloud"],
-    "home-automation": ["homeassistant"],
-    "development": ["gitea"]
-  }
+    "media": [
+      "plex",
+      "jellyfin",
+      "emby"
+    ],
+    "automation": [
+      "radarr",
+      "sonarr"
+    ],
+    "monitoring": [
+      "grafana"
+    ],
+    "networking": [
+      "pihole",
+      "nginx-proxy-manager"
+    ],
+    "storage": [
+      "nextcloud"
+    ],
+    "home-automation": [
+      "homeassistant"
+    ],
+    "development": [
+      "gitea"
+    ]
+  },
+  "lastSync": "2025-08-25T00:19:49.233Z",
+  "syncedFrom": "https://raw.githubusercontent.com/TOoSmOotH/homie/main"
 }
