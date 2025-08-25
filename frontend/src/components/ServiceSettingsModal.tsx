@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
-import { X, Save, RotateCcw, Eye, EyeOff } from 'lucide-react';
+import { X, Save, RotateCcw, Eye, EyeOff, Wifi, CheckCircle, XCircle } from 'lucide-react';
 import axios from 'axios';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { cn } from '@/utils/cn';
 
 interface SettingsField {
   key: string;
@@ -55,6 +56,7 @@ const ServiceSettingsModal: React.FC<Props> = ({ service, onClose }) => {
   const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
   const [hasChanges, setHasChanges] = useState(false);
   const [serviceName, setServiceName] = useState(service.name);
+  const [connectionStatus, setConnectionStatus] = useState<'untested' | 'testing' | 'success' | 'failed'>('untested');
 
   // Initialize settings from service config
   useEffect(() => {
@@ -106,6 +108,32 @@ const ServiceSettingsModal: React.FC<Props> = ({ service, onClose }) => {
       ...prev,
       [key]: !prev[key]
     }));
+  };
+
+  const testConnection = async () => {
+    setConnectionStatus('testing');
+    try {
+      const response = await axios.post(
+        `/api/services/${service.id}/test`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        }
+      );
+      
+      if (response.data.success) {
+        setConnectionStatus('success');
+        // Refresh services to update status
+        queryClient.invalidateQueries({ queryKey: ['services'] });
+      } else {
+        setConnectionStatus('failed');
+      }
+    } catch (error) {
+      console.error('Connection test failed:', error);
+      setConnectionStatus('failed');
+    }
   };
 
   const renderField = (field: SettingsField) => {
@@ -371,8 +399,84 @@ const ServiceSettingsModal: React.FC<Props> = ({ service, onClose }) => {
                         A friendly name to identify this service instance
                       </p>
                     </div>
+                  ) : section.id === 'connection' ? (
+                    <>
+                      {/* Connection fields */}
+                      {section.fields.map((field) => (
+                        <div key={field.key}>
+                          {renderField(field)}
+                        </div>
+                      ))}
+                      
+                      {/* Test Connection Button */}
+                      <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="text-sm font-medium text-gray-900 dark:text-white">Connection Status</h4>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                              Test the connection to verify your settings are correct
+                            </p>
+                          </div>
+                          <button
+                            onClick={testConnection}
+                            disabled={!settings.url || connectionStatus === 'testing'}
+                            className={cn(
+                              "flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors",
+                              connectionStatus === 'testing' 
+                                ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 cursor-wait"
+                                : connectionStatus === 'success'
+                                ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
+                                : connectionStatus === 'failed'
+                                ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300"
+                                : !settings.url
+                                ? "bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 cursor-not-allowed"
+                                : "bg-blue-600 hover:bg-blue-700 text-white"
+                            )}
+                          >
+                            {connectionStatus === 'testing' ? (
+                              <>
+                                <Wifi className="h-4 w-4 animate-pulse" />
+                                Testing...
+                              </>
+                            ) : connectionStatus === 'success' ? (
+                              <>
+                                <CheckCircle className="h-4 w-4" />
+                                Connected
+                              </>
+                            ) : connectionStatus === 'failed' ? (
+                              <>
+                                <XCircle className="h-4 w-4" />
+                                Failed
+                              </>
+                            ) : (
+                              <>
+                                <Wifi className="h-4 w-4" />
+                                Test Connection
+                              </>
+                            )}
+                          </button>
+                        </div>
+                        
+                        {/* Connection status message */}
+                        {connectionStatus === 'success' && (
+                          <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                            <p className="text-sm text-green-800 dark:text-green-200">
+                              ✓ Successfully connected to the service
+                            </p>
+                          </div>
+                        )}
+                        
+                        {connectionStatus === 'failed' && (
+                          <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                            <p className="text-sm text-red-800 dark:text-red-200">
+                              ✗ Could not connect to the service. Please check your settings.
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </>
                   ) : (
-                    // Regular fields
+                    // Regular fields for other sections
                     section.fields.map((field) => (
                       <div key={field.key}>
                         {renderField(field)}

@@ -17,6 +17,8 @@ export class GenericServiceController {
       const { id } = req.params;
       const { endpoint, params } = req.body;
 
+      logger.info(`Fetching data for service ${id}, endpoint: ${endpoint}`);
+
       // Get service with definition
       const dataSource = dbConnection.getDataSource();
       const serviceRepository = dataSource.getRepository(Service);
@@ -43,10 +45,32 @@ export class GenericServiceController {
         return;
       }
 
+      // Check if definition exists
+      if (!service.definition) {
+        logger.error(`Service ${id} has no definition loaded`);
+        res.status(400).json({
+          success: false,
+          error: { message: 'Service definition not found. Please reinstall the service.' }
+        });
+        return;
+      }
+
+      // Check if manifest exists
+      if (!service.definition.manifest) {
+        logger.error(`Service ${id} definition has no manifest`);
+        res.status(400).json({
+          success: false,
+          error: { message: 'Service manifest not found. Please reinstall the service.' }
+        });
+        return;
+      }
+
       // Get endpoint definition from marketplace
-      const endpointDef = service.definition?.manifest?.api?.endpoints?.[endpoint];
+      const endpointDef = service.definition.manifest?.api?.endpoints?.[endpoint];
       
       if (!endpointDef) {
+        logger.error(`Unknown endpoint: ${endpoint} for service ${id}`);
+        logger.debug(`Available endpoints: ${Object.keys(service.definition.manifest?.api?.endpoints || {}).join(', ')}`);
         res.status(400).json({
           success: false,
           error: { message: `Unknown endpoint: ${endpoint}` }
@@ -73,8 +97,26 @@ export class GenericServiceController {
       // Add params
       if (endpointDef.params) {
         const interpolatedParams: any = {};
+        
+        // Prepare default values for common parameters
+        const now = new Date();
+        const startOfWeek = new Date(now);
+        startOfWeek.setDate(now.getDate() - now.getDay());
+        const endOfWeek = new Date(now);
+        endOfWeek.setDate(now.getDate() + (6 - now.getDay()));
+        
+        const defaultParams = {
+          startDate: startOfWeek.toISOString().split('T')[0],
+          endDate: endOfWeek.toISOString().split('T')[0],
+          ...params
+        };
+        
         for (const [key, value] of Object.entries(endpointDef.params)) {
-          interpolatedParams[key] = this.interpolateValue(value as string, { ...service.config, ...params });
+          const interpolated = this.interpolateValue(value as string, { ...service.config, ...defaultParams });
+          // Only add param if it was successfully interpolated (not still a template)
+          if (!interpolated.includes('{')) {
+            interpolatedParams[key] = interpolated;
+          }
         }
         requestConfig.params = interpolatedParams;
       }
@@ -85,16 +127,31 @@ export class GenericServiceController {
       }
 
       // Make the request
-      const response = await axios(requestConfig);
+      logger.debug(`Making request to: ${requestConfig.url}`);
+      let response;
+      try {
+        response = await axios(requestConfig);
+      } catch (axiosError: any) {
+        logger.error(`Request failed: ${axiosError.message}`);
+        if (axiosError.code === 'ECONNREFUSED') {
+          throw new Error(`Cannot connect to service at ${service.config.url}. Please check if the service is running.`);
+        }
+        throw axiosError;
+      }
 
       // Apply transformation if specified
       let responseData = response.data;
       if (endpointDef.transform) {
         try {
+          logger.debug(`Applying transform: ${endpointDef.transform}`);
           const transformFn = new Function('response', `return ${endpointDef.transform}`);
           responseData = transformFn(response.data);
         } catch (e) {
           logger.error('Transform error:', e);
+          logger.error('Transform function:', endpointDef.transform);
+          logger.error('Response data:', JSON.stringify(response.data).substring(0, 200));
+          // Return untransformed data if transform fails
+          responseData = response.data;
         }
       }
 
@@ -108,8 +165,9 @@ export class GenericServiceController {
         success: true,
         data: responseData
       });
-    } catch (error) {
+    } catch (error: any) {
       logger.error('Error fetching service data:', error);
+      logger.error('Error stack:', error.stack);
       
       // Update service status to offline if connection failed
       if (axios.isAxiosError(error)) {
@@ -133,7 +191,14 @@ export class GenericServiceController {
           }
         });
       } else {
-        next(error);
+        // Send error response instead of passing to next() to prevent crashes
+        res.status(500).json({
+          success: false,
+          error: { 
+            message: 'Internal server error while fetching data',
+            details: error.message
+          }
+        });
       }
     }
   };
@@ -279,6 +344,15 @@ export class GenericServiceController {
         res.status(400).json({
           success: false,
           error: { message: `Unknown action: ${actionId}` }
+        });
+        return;
+      }
+
+      // Check if action has API configuration
+      if (!action.api) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'Action does not have API configuration' }
         });
         return;
       }

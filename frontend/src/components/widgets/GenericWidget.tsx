@@ -57,19 +57,25 @@ const GenericWidget: React.FC<GenericWidgetProps> = ({ service, widget, settings
 
       // Fetch data from each source
       for (const source of sources) {
-        const response = await axios.post(
-          `/api/services/${service.id}/data`,
-          {
-            endpoint: source,
-            serviceType: service.definition?.serviceId
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`
+        try {
+          const response = await axios.post(
+            `/api/services/${service.id}/data`,
+            {
+              endpoint: source,
+              serviceType: service.definition?.serviceId
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+              }
             }
-          }
-        );
-        results[source] = response.data.data;
+          );
+          results[source] = response.data.data;
+        } catch (sourceError: any) {
+          console.error(`Failed to fetch data for source ${source}:`, sourceError);
+          // Continue with other sources if one fails
+          results[source] = null;
+        }
       }
 
       // If single source, use data directly

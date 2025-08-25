@@ -65,7 +65,17 @@ const ServiceDashboard: React.FC<ServiceDashboardProps> = ({ service, onOpenSett
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {widgets.map((widget: any) => {
           // Check if widget should be shown based on settings
-          const showKey = `show_${widget.id}`;
+          // Map widget IDs to their setting keys
+          const widgetSettingMap: Record<string, string> = {
+            'download_queue': 'show_queue',
+            'upcoming_movies': 'show_upcoming',
+            'missing_counter': 'show_missing',
+            'system_status': 'show_status'
+          };
+          
+          const showKey = widgetSettingMap[widget.id] || `show_${widget.id}`;
+          
+          // Default to showing widget if no explicit setting exists
           if (settings[showKey] === false) {
             return null;
           }

@@ -1,0 +1,146 @@
+{
+  "id": "your-service-id",
+  "name": "Your Service Name",
+  "version": "1.0.0",
+  "author": "Your Name",
+  "description": "Brief description of your service",
+  "longDescription": "Detailed description of what your service does and its main features",
+  "category": "choose-appropriate-category",
+  "tags": ["tag1", "tag2", "tag3"],
+  "icon": "📦",
+  "homepage": "https://your-service-homepage.com",
+  "documentation": "https://your-service-docs.com",
+  
+  "connection": {
+    "type": "api",
+    "auth": "apikey",
+    "fields": [
+      {
+        "key": "url",
+        "label": "Service URL",
+        "type": "url",
+        "required": true,
+        "placeholder": "http://192.168.1.100:8080",
+        "description": "The URL to your service instance"
+      },
+      {
+        "key": "api_key",
+        "label": "API Key",
+        "type": "password",
+        "required": true,
+        "description": "Your service API key"
+      }
+    ],
+    "testEndpoint": {
+      "path": "/api/health",
+      "method": "GET",
+      "headers": {
+        "X-Api-Key": "{api_key}"
+      },
+      "expectedStatus": 200,
+      "successIndicator": "status"
+    }
+  },
+  
+  "api": {
+    "baseUrl": "{url}",
+    "headers": {
+      "X-Api-Key": "{api_key}",
+      "Content-Type": "application/json"
+    },
+    "endpoints": {
+      "status": {
+        "path": "/api/status",
+        "method": "GET",
+        "refresh": 30000,
+        "cache": 60000
+      },
+      "data": {
+        "path": "/api/data",
+        "method": "GET",
+        "params": {
+          "limit": "100"
+        },
+        "transform": "response.items",
+        "refresh": 60000
+      }
+    }
+  },
+  
+  "widgets": [
+    {
+      "id": "status_widget",
+      "name": "Status",
+      "type": "stat",
+      "icon": "📊",
+      "size": "small",
+      "dataSource": "status",
+      "display": {
+        "value": "{status}",
+        "label": "Service Status",
+        "color": "primary"
+      }
+    },
+    {
+      "id": "data_list",
+      "name": "Recent Data",
+      "type": "list",
+      "icon": "📋",
+      "size": "large",
+      "dataSource": "data",
+      "display": {
+        "itemTemplate": {
+          "title": "{name}",
+          "subtitle": "{description}"
+        },
+        "emptyMessage": "No data available",
+        "maxItems": 10
+      }
+    }
+  ],
+  
+  "transformers": {
+    "filesize": "function(bytes) { return (bytes / 1024 / 1024).toFixed(2) + ' MB'; }",
+    "date": "function(dateStr) { return new Date(dateStr).toLocaleDateString(); }",
+    "percentage": "function(value) { return (value * 100).toFixed(1) + '%'; }"
+  },
+  
+  "settings": {
+    "sections": [
+      {
+        "id": "display",
+        "name": "Display Settings",
+        "icon": "🎨",
+        "fields": [
+          {
+            "key": "show_status",
+            "label": "Show Status Widget",
+            "type": "boolean",
+            "default": true,
+            "description": "Display the status widget on dashboard"
+          },
+          {
+            "key": "show_data",
+            "label": "Show Data List",
+            "type": "boolean",
+            "default": true,
+            "description": "Display the data list widget"
+          }
+        ]
+      }
+    ]
+  },
+  
+  "quickActions": [
+    {
+      "id": "refresh",
+      "name": "Refresh Data",
+      "icon": "🔄",
+      "confirm": false,
+      "api": {
+        "endpoint": "/api/refresh",
+        "method": "POST"
+      }
+    }
+  ]
+}

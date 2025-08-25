@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import MarketplaceServiceModal from '@/components/MarketplaceServiceModal';
 import ServiceSettingsModal from '@/components/ServiceSettingsModal';
+import ServiceDashboard from '@/components/services/ServiceDashboard';
 import axios from 'axios';
 import { 
   Server, 
@@ -26,7 +27,9 @@ import {
   Filter,
   Grid3X3,
   List,
-  Link2
+  Link2,
+  LayoutDashboard,
+  X
 } from 'lucide-react';
 
 interface Service {
@@ -86,6 +89,7 @@ const Services: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedMarketplaceService, setSelectedMarketplaceService] = useState<MarketplaceService | null>(null);
+  const [viewingDashboard, setViewingDashboard] = useState<Service | null>(null);
 
   // Fetch installed services
   const { data: services = [], isLoading: servicesLoading, error: servicesError, refetch } = useQuery({
@@ -398,6 +402,14 @@ const Services: React.FC = () => {
                     <div className="flex items-center gap-2">
                       <Button
                         size="sm"
+                        variant="primary"
+                        onClick={() => setViewingDashboard(service)}
+                      >
+                        <LayoutDashboard className="h-3 w-3 mr-1" />
+                        Dashboard
+                      </Button>
+                      <Button
+                        size="sm"
                         variant="outline"
                         onClick={() => checkStatusMutation.mutate(service.id)}
                         disabled={checkStatusMutation.isPending}
@@ -537,6 +549,34 @@ const Services: React.FC = () => {
           service={editingService}
           onClose={() => setEditingService(null)}
         />
+      )}
+
+      {/* Service Dashboard Modal */}
+      {viewingDashboard && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                {viewingDashboard.name} Dashboard
+              </h2>
+              <button
+                onClick={() => setViewingDashboard(null)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              <ServiceDashboard
+                service={viewingDashboard}
+                onOpenSettings={() => {
+                  setEditingService(viewingDashboard);
+                  setViewingDashboard(null);
+                }}
+              />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

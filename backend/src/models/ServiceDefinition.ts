@@ -41,8 +41,8 @@ export interface ServiceRequirement {
 export interface ServiceConfigField {
   key: string;
   label: string;
-  type: 'text' | 'password' | 'number' | 'boolean' | 'select' | 'url' | 'port' | 'path';
-  required: boolean;
+  type: 'text' | 'password' | 'number' | 'boolean' | 'select' | 'url' | 'port' | 'path' | 'multiselect';
+  required?: boolean;
   default?: any;
   placeholder?: string;
   description?: string;
@@ -53,9 +53,14 @@ export interface ServiceConfigField {
     minLength?: number;
     maxLength?: number;
   };
-  options?: Array<{ value: string; label: string }>;
-  dependsOn?: string; // Another field key that this depends on
-  showIf?: { field: string; value: any }; // Conditional display
+  min?: number;
+  max?: number;
+  options?: Array<{ value: string; label: string }> | 'dynamic';
+  depends_on?: string; // Another field key that this depends on
+  dependsOn?: string; // Alternative spelling
+  show_if?: boolean | any; // Conditional display
+  showIf?: { field: string; value: any }; // Alternative conditional display
+  affects?: string; // What this field affects (e.g., widget visibility)
 }
 
 export interface ServiceDockerConfig {
@@ -91,6 +96,76 @@ export interface ServiceManifest {
   requirements: ServiceRequirement[];
   configFields: ServiceConfigField[];
   dockerConfig?: ServiceDockerConfig;
+  // Connection configuration
+  connection?: {
+    type: string;
+    auth: string;
+    fields: Array<{
+      key: string;
+      label: string;
+      type: string;
+      required: boolean;
+      placeholder?: string;
+      description?: string;
+      default?: any;
+    }>;
+    testEndpoint?: {
+      path: string;
+      method: string;
+      headers?: Record<string, string>;
+      expectedStatus?: number;
+      successIndicator?: string;
+    };
+  };
+  // API configuration
+  api?: {
+    baseUrl?: string;
+    headers?: Record<string, string>;
+    endpoints?: Record<string, {
+      path: string;
+      method?: string;
+      params?: Record<string, string>;
+      body?: any;
+      refresh?: number;
+      cache?: number;
+      transform?: string;
+    }>;
+  };
+  // Widget definitions
+  widgets?: Array<{
+    id: string;
+    name: string;
+    type: string;
+    icon?: string;
+    size?: string;
+    dataSource: string | string[];
+    display: any;
+  }>;
+  // Settings sections
+  settings?: {
+    sections: Array<{
+      id: string;
+      name: string;
+      icon: string;
+      fields: ServiceConfigField[];
+    }>;
+  };
+  // Quick actions
+  quickActions?: Array<{
+    id: string;
+    name: string;
+    icon: string;
+    action?: 'open_url' | 'api_call' | 'docker_command';
+    confirm?: boolean;
+    api?: {
+      endpoint: string;
+      method?: string;
+      body?: any;
+    };
+    config?: any;
+  }>;
+  // Data transformers
+  transformers?: Record<string, string>;
   apiIntegration?: {
     baseUrlPattern: string; // e.g., "http://{host}:{port}"
     apiKeyField?: string;
@@ -98,13 +173,6 @@ export interface ServiceManifest {
     healthCheckEndpoint?: string;
     testEndpoint?: string;
   };
-  quickActions?: Array<{
-    id: string;
-    name: string;
-    icon: string;
-    action: 'open_url' | 'api_call' | 'docker_command';
-    config: any;
-  }>;
   screenshots?: string[];
   defaultConfig?: Record<string, any>;
   setupSteps?: string[];
