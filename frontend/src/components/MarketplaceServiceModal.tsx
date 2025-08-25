@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/Button';
-import { X, Download, Check, Zap, Link2, Key, Globe } from 'lucide-react';
+import { X, Check, Link2, Key, Globe } from 'lucide-react';
 
 interface ServiceFeature {
   id: string;
@@ -50,7 +50,7 @@ interface MarketplaceService {
 interface Props {
   service: MarketplaceService;
   onClose: () => void;
-  onConnect: (serviceId: string) => void;
+  onConnect: (serviceId: string, config?: any) => void;
   isConnecting?: boolean;
 }
 
@@ -60,6 +60,9 @@ const MarketplaceServiceModal: React.FC<Props> = ({
   onConnect,
   isConnecting = false 
 }) => {
+  // Debug: Log the service data to see what's being passed
+  console.log('MarketplaceServiceModal - Service data:', service);
+  
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
@@ -242,11 +245,17 @@ const MarketplaceServiceModal: React.FC<Props> = ({
                 Cancel
               </Button>
               <Button
-                onClick={() => onConnect(service.serviceId || service.id)}
+                onClick={() => {
+                  // Auto-generate name with service display name
+                  const autoName = service.displayName || service.name;
+                  onConnect(service.serviceId || service.id, {
+                    name: autoName
+                  });
+                }}
                 disabled={isConnecting}
               >
                 <Link2 className="h-4 w-4 mr-2" />
-                Connect Service
+                {isConnecting ? 'Installing...' : 'Install Service'}
               </Button>
             </div>
           </div>

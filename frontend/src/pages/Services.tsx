@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import MarketplaceServiceModal from '@/components/MarketplaceServiceModal';
+import ServiceSettingsModal from '@/components/ServiceSettingsModal';
 import axios from 'axios';
 import { 
   Server, 
@@ -153,8 +154,8 @@ const Services: React.FC = () => {
 
   // Install from marketplace mutation
   const installMutation = useMutation({
-    mutationFn: async (serviceId: string) => {
-      const response = await axios.post(`/api/marketplace/install/${serviceId}`);
+    mutationFn: async ({ serviceId, config }: { serviceId: string; config?: any }) => {
+      const response = await axios.post(`/api/marketplace/install/${serviceId}`, config);
       return response.data;
     },
     onSuccess: () => {
@@ -522,11 +523,19 @@ const Services: React.FC = () => {
         <MarketplaceServiceModal
           service={selectedMarketplaceService as any}
           onClose={() => setSelectedMarketplaceService(null)}
-          onConnect={(serviceId) => {
-            installMutation.mutate(serviceId);
+          onConnect={(serviceId, config) => {
+            installMutation.mutate({ serviceId, config });
             setSelectedMarketplaceService(null);
           }}
           isConnecting={installMutation.isPending}
+        />
+      )}
+
+      {/* Service Settings Modal */}
+      {editingService && (
+        <ServiceSettingsModal
+          service={editingService}
+          onClose={() => setEditingService(null)}
         />
       )}
     </div>

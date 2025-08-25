@@ -14,9 +14,19 @@ export class MarketplaceController {
     try {
       const services = await marketplaceService.getAvailableServices();
       
+      // Transform services to include manifest data at the top level
+      const transformedServices = services.map(service => ({
+        ...service,
+        ...service.manifest,
+        // Keep the original id from the entity
+        id: service.id,
+        // Use serviceId from the manifest
+        serviceId: service.serviceId
+      }));
+      
       res.json({
         success: true,
-        data: services
+        data: transformedServices
       });
     } catch (error) {
       logger.error('Error getting marketplace services:', error);

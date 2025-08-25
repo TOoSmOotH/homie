@@ -21,9 +21,21 @@ export class ServiceCrudController {
         order: { createdAt: 'DESC' }
       });
 
+      // Transform services to include manifest data at the definition level
+      const transformedServices = services.map(service => ({
+        ...service,
+        definition: service.definition ? {
+          ...service.definition,
+          ...(service.definition.manifest || {}),
+          // Keep the original id and other fields
+          id: service.definition.id,
+          serviceId: service.definition.serviceId
+        } : null
+      }));
+
       res.json({
         success: true,
-        data: services
+        data: transformedServices
       });
     } catch (error) {
       logger.error('Error getting services:', error);
@@ -51,9 +63,21 @@ export class ServiceCrudController {
         return;
       }
 
+      // Transform service to include manifest data at the definition level
+      const transformedService = {
+        ...service,
+        definition: service.definition ? {
+          ...service.definition,
+          ...(service.definition.manifest || {}),
+          // Keep the original id and other fields
+          id: service.definition.id,
+          serviceId: service.definition.serviceId
+        } : null
+      };
+
       res.json({
         success: true,
-        data: service
+        data: transformedService
       });
     } catch (error) {
       logger.error('Error getting service:', error);
@@ -162,9 +186,21 @@ export class ServiceCrudController {
 
       const updatedService = await serviceRepository.save(service);
 
+      // Transform service to include manifest data at the definition level
+      const transformedService = {
+        ...updatedService,
+        definition: updatedService.definition ? {
+          ...updatedService.definition,
+          ...(updatedService.definition.manifest || {}),
+          // Keep the original id and other fields
+          id: updatedService.definition.id,
+          serviceId: updatedService.definition.serviceId
+        } : null
+      };
+
       res.json({
         success: true,
-        data: updatedService
+        data: transformedService
       });
     } catch (error) {
       logger.error('Error updating service:', error);

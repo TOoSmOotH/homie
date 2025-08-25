@@ -171,5 +171,108 @@
       "refresh": 60000,
       "size": "small"
     }
-  ]
+  ],
+  "settings": {
+    "sections": [
+      {
+        "id": "display",
+        "name": "Display Settings",
+        "icon": "🎨",
+        "fields": [
+          {
+            "key": "show_queue",
+            "label": "Show Download Queue",
+            "type": "boolean",
+            "default": true,
+            "description": "Display active downloads on the dashboard"
+          },
+          {
+            "key": "show_upcoming",
+            "label": "Show Upcoming Movies",
+            "type": "boolean",
+            "default": true,
+            "description": "Display upcoming movies calendar"
+          },
+          {
+            "key": "show_missing",
+            "label": "Show Missing Movies",
+            "type": "boolean",
+            "default": true,
+            "description": "Display count of missing movies"
+          },
+          {
+            "key": "max_items",
+            "label": "Maximum Items to Display",
+            "type": "number",
+            "default": 10,
+            "min": 5,
+            "max": 50,
+            "description": "Maximum number of items to show in lists"
+          }
+        ]
+      },
+      {
+        "id": "monitoring",
+        "name": "Monitoring",
+        "icon": "📊",
+        "fields": [
+          {
+            "key": "enable_notifications",
+            "label": "Enable Notifications",
+            "type": "boolean",
+            "default": false,
+            "description": "Send notifications for downloads and errors"
+          },
+          {
+            "key": "check_health",
+            "label": "Monitor System Health",
+            "type": "boolean",
+            "default": true,
+            "description": "Check for Radarr system health issues"
+          },
+          {
+            "key": "sync_interval",
+            "label": "Sync Interval (minutes)",
+            "type": "number",
+            "default": 30,
+            "min": 5,
+            "max": 120,
+            "description": "How often to sync with Radarr"
+          }
+        ]
+      },
+      {
+        "id": "automation",
+        "name": "Automation",
+        "icon": "🤖",
+        "fields": [
+          {
+            "key": "auto_search",
+            "label": "Auto-Search for Missing",
+            "type": "boolean",
+            "default": false,
+            "description": "Automatically search for missing movies"
+          },
+          {
+            "key": "auto_search_interval",
+            "label": "Auto-Search Interval (hours)",
+            "type": "number",
+            "default": 24,
+            "min": 1,
+            "max": 168,
+            "description": "Hours between automatic searches",
+            "depends_on": "auto_search",
+            "show_if": true
+          },
+          {
+            "key": "quality_profile",
+            "label": "Default Quality Profile",
+            "type": "select",
+            "options": "dynamic",
+            "description": "Quality profile for new movies"
+          }
+        ]
+      }
+    ]
+  }
 }
