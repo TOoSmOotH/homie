@@ -4,6 +4,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/utils/responsive';
 import { cn } from '@/utils/cn';
+import homieLogo from '@/assets/homie.png';
 import {
   Home,
   Settings,
@@ -47,7 +48,7 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
             </button>
           )}
           <Link to="/" className="flex items-center space-x-2">
-            <Server className="h-8 w-8 text-primary-600" />
+            <img src={homieLogo} alt="Homie logo" className="h-8 w-8" />
             <span className="text-xl font-bold text-gray-900 dark:text-gray-100">Homie</span>
           </Link>
         </div>
