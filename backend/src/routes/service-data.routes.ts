@@ -5,8 +5,8 @@ import { authenticateToken } from '../middleware/auth.middleware';
 const router = Router();
 const controller = new GenericServiceController();
 
-// All routes require authentication
-router.use(authenticateToken);
+// Require authentication only for service endpoints within this router
+router.use('/services', authenticateToken);
 
 // Generic data fetching for any service
 router.post('/services/:id/data', controller.fetchData);
