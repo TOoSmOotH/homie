@@ -43,13 +43,16 @@ export class WebSocketService {
   }
 
   private setupSocket() {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('accessToken');
 
-    const wsUrl = (import.meta as any).env?.VITE_WS_URL || (typeof window !== 'undefined' ? `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.hostname}:9825` : 'ws://localhost:9825');
+    // Prefer current origin so we don't lock to a hostname/port
+    const explicitUrl = (import.meta as any).env?.VITE_WS_URL as string | undefined;
+    const wsUrl = explicitUrl || undefined; // undefined lets socket.io use window.location origin
+
     this.socket = io(wsUrl, {
       path: '/socket.io',
       auth: {
-        token: token
+        token
       },
       transports: ['websocket', 'polling'],
       upgrade: true,

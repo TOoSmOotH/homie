@@ -24,6 +24,10 @@ app.set('trust proxy', 1);
 
 // Security middleware
 app.use(helmet({
+  // Explicitly disable HSTS to avoid browsers forcing HTTPS on custom hosts/ports
+  hsts: false,
+  // Suppress Origin-Agent-Cluster header to reduce confusing console noise
+  originAgentCluster: false,
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
