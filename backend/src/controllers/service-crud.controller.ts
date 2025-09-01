@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { dbConnection } from '../database/connection';
+import { dbConnection } from '@/database/connection';
 import { Service, ServiceStatus } from '../models/Service';
 import { ServiceDefinition } from '../models/ServiceDefinition';
 import { logger } from '../utils/logger';

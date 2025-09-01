@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-import { dbConnection } from '../database/connection';
+import { dbConnection } from '@/database/connection';
 import { ServiceDefinition, ServiceDefinitionStatus, ServiceDefinitionCategory } from '../models/ServiceDefinition';
 import { logger } from '../utils/logger';
 import axios from 'axios';

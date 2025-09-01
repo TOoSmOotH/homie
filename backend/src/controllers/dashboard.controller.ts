@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { dbConnection } from '../database/connection';
+import { dbConnection } from '@/database/connection';
 import { Service, ServiceStatus } from '../models/Service';
 import { logger } from '../utils/logger';
 import * as os from 'os';
@@ -17,8 +17,8 @@ export class DashboardController {
         serviceRepository.find()
       ]);
 
-      const activeServices = services.filter(s => s.status === ServiceStatus.ONLINE).length;
-      const inactiveServices = services.filter(s => s.status === ServiceStatus.OFFLINE).length;
+      const activeServices = services.filter((s: Service) => s.status === ServiceStatus.ONLINE).length;
+      const inactiveServices = services.filter((s: Service) => s.status === ServiceStatus.OFFLINE).length;
 
       // Calculate system health based on service status
       const systemHealth = totalServices > 0 
@@ -34,7 +34,7 @@ export class DashboardController {
       };
 
       // Generate recent activity
-      const recentActivity = services.slice(0, 5).map((service, index) => ({
+      const recentActivity = services.slice(0, 5).map((service: Service, index: number) => ({
         id: index + 1,
         message: `Service ${service.name} was ${service.status === ServiceStatus.ONLINE ? 'checked and is online' : 'checked and is offline'}`,
         time: service.lastChecked ? new Date(service.lastChecked).toLocaleTimeString() : 'Never',
@@ -70,8 +70,8 @@ export class DashboardController {
         serviceRepository.find()
       ]);
 
-      const activeServices = services.filter(s => s.status === ServiceStatus.ONLINE).length;
-      const inactiveServices = services.filter(s => s.status === ServiceStatus.OFFLINE).length;
+      const activeServices = services.filter((s: Service) => s.status === ServiceStatus.ONLINE).length;
+      const inactiveServices = services.filter((s: Service) => s.status === ServiceStatus.OFFLINE).length;
 
       res.json({
         success: true,
@@ -93,15 +93,15 @@ export class DashboardController {
       const dataSource = dbConnection.getDataSource();
       const serviceRepository = dataSource.getRepository(Service);
 
-      const services = await serviceRepository.find({
+      const services: Service[] = await serviceRepository.find({
         order: { updatedAt: 'DESC' },
         take: 10
       });
 
       const summary = {
         totalServices: await serviceRepository.count(),
-        servicesOnline: services.filter(s => s.status === ServiceStatus.ONLINE).length,
-        servicesOffline: services.filter(s => s.status === ServiceStatus.OFFLINE).length,
+        servicesOnline: services.filter((s: Service) => s.status === ServiceStatus.ONLINE).length,
+        servicesOffline: services.filter((s: Service) => s.status === ServiceStatus.OFFLINE).length,
         lastUpdated: services[0]?.updatedAt || new Date(),
         recentlyUpdated: services.map(s => ({
           id: s.id,
@@ -163,11 +163,11 @@ export class DashboardController {
       const dataSource = dbConnection.getDataSource();
       const serviceRepository = dataSource.getRepository(Service);
 
-      const offlineServices = await serviceRepository.find({
+      const offlineServices: Service[] = await serviceRepository.find({
         where: { status: ServiceStatus.OFFLINE }
       });
 
-      const alerts = offlineServices.map(service => ({
+      const alerts = offlineServices.map((service: Service) => ({
         id: service.id,
         type: 'service_offline',
         severity: 'warning',
@@ -210,12 +210,12 @@ export class DashboardController {
       const dataSource = dbConnection.getDataSource();
       const serviceRepository = dataSource.getRepository(Service);
 
-      const services = await serviceRepository.find({
+      const services: Service[] = await serviceRepository.find({
         order: { updatedAt: 'DESC' },
         take: 20
       });
 
-      const activities = services.map((service, index) => ({
+      const activities = services.map((service: Service, index: number) => ({
         id: index + 1,
         type: 'service_update',
         message: `Service ${service.name} was ${

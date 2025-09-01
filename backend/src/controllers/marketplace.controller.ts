@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { marketplaceService } from '../services/marketplace.service';
 import { ServiceDefinitionCategory } from '../models/ServiceDefinition';
 import { logger } from '../utils/logger';
-import { dbConnection } from '../database/connection';
+import { dbConnection } from '@/database/connection';
 import { Service, ServiceStatus } from '../models/Service';
 import { AuthenticatedRequest } from '../middleware/auth.middleware';
 
