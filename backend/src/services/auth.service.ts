@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { Repository } from 'typeorm';
-import { dbConnection } from '../database/connection.js';
+import { dbConnection } from '../database/connection';
 import { User, UserStatus, UserRole } from '../models/User';
 import { config } from '../config';
 import { logger } from '../utils/logger';

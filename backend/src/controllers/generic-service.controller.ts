@@ -5,7 +5,7 @@ import http from 'http';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { Client: SSHClient } = require('ssh2');
 const WebSocket = require('ws');
-import { dbConnection } from '../database/connection.js';
+import { dbConnection } from '../database/connection';
 import { Service, ServiceStatus } from '../models/Service';
 import { logger } from '../utils/logger';
 import { validateDockerRequest, validateSshCommand } from '../utils/transportGuards';

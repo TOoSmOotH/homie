@@ -1,7 +1,7 @@
 import app from './app';
 import { logger } from './utils/logger';
 import { config } from './config';
-import { dbConnection } from './database/connection.js';
+import { dbConnection } from './database/connection';
 import { Server as SocketServer } from 'socket.io';
 import http from 'http';
 import WebSocketService from './services/websocket.service';
