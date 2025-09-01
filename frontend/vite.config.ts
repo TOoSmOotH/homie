@@ -10,11 +10,11 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:9825',
+        target: process.env.BACKEND_PROXY_TARGET || 'http://localhost:9825',
         changeOrigin: true
       },
       '/socket.io': {
-        target: 'http://localhost:9825',
+        target: process.env.BACKEND_PROXY_TARGET || 'http://localhost:9825',
         ws: true,
         changeOrigin: true
       }
