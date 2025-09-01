@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
-import { dbConnection } from '../database/connection';
+import { dbConnection } from '../database/connection.js';
 import { User, UserStatus, UserRole } from '../models/User';
 import { logger } from '../utils/logger';
 import { AppError } from '../middleware/auth.middleware';
