@@ -419,7 +419,7 @@ Here's a complete example of a monitoring service:
         "label": "Monitor URL",
         "type": "url",
         "required": true,
-        "placeholder": "http://localhost:3000",
+        "placeholder": "http://localhost:9826",
         "description": "URL to your monitor instance"
       },
       {

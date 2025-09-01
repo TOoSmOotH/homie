@@ -37,13 +37,13 @@ export class AppPreferences {
   appDescription?: string;
 
   // Server configuration
-  @Column({ type: 'int', default: 9825 })
+  @Column({ type: 'int', default: 9827 })
   defaultPort!: number;
 
   @Column({ type: 'boolean', default: true })
   enableCORS!: boolean;
 
-  @Column({ type: 'text', default: 'http://localhost:3000' })
+  @Column({ type: 'text', default: 'http://localhost:9826' })
   allowedOrigins!: string; // JSON array of allowed origins
 
   @Column({ type: 'boolean', default: true })
@@ -329,9 +329,9 @@ export class AppPreferences {
     return {
       appName: 'Homie',
       appVersion: '1.0.0',
-      defaultPort: 9825,
+      defaultPort: 9827,
       enableCORS: true,
-      allowedOrigins: JSON.stringify(['http://localhost:3000']),
+      allowedOrigins: JSON.stringify(['http://localhost:9826']),
       enableCompression: true,
       enableRateLimiting: true,
       rateLimitMaxRequests: 100,

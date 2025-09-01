@@ -6,7 +6,7 @@ import { Alert, AlertDescription } from '@/components/ui/Alert';
 import { CheckCircle, XCircle, Mail, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:9825/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:9827/api';
 
 export default function EmailVerification() {
   const [searchParams] = useSearchParams();

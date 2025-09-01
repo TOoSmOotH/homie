@@ -115,7 +115,7 @@ JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
 JWT_EXPIRES_IN=7d
 
 # Frontend
-FRONTEND_URL=http://localhost:3000
+FRONTEND_URL=http://localhost:9826
 BASE_PATH=/homie
 
 # External Services Configuration
@@ -150,7 +150,7 @@ A web-based application for monitoring and controlling your home lab services in
 2. Copy `.env.example` to `.env` and configure your settings
 3. Run `npm install`
 4. Run `npm run docker:dev` for development
-5. Access the application at `http://localhost:3000/homie`
+5. Access the application at `http://localhost:9826/homie`
 
 ## Documentation
 
@@ -493,7 +493,7 @@ export default defineConfig({
   plugins: [react()],
   base: '/homie/',
   server: {
-    port: 3000,
+    port: 9826,
     proxy: {
       '/api': {
         target: 'http://localhost:3001',
@@ -749,7 +749,7 @@ echo "✅ Setup complete!"
 echo "🎯 Next steps:"
 echo "  1. Edit .env file with your configuration"
 echo "  2. Run 'npm run docker:dev' to start development environment"
-echo "  3. Access the application at http://localhost:3000/homie"
+echo "  3. Access the application at http://localhost:9826/homie"
 ```
 
 ### Step 6.2: Build Script

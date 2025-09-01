@@ -6,15 +6,15 @@ export default defineConfig({
   plugins: [react()],
   base: process.env.NODE_ENV === 'production' ? '/homie/' : '/',
   server: {
-    port: 3000,
+    port: 9826,
     host: true,
     proxy: {
       '/api': {
-        target: process.env.BACKEND_PROXY_TARGET || 'http://localhost:9825',
+        target: process.env.BACKEND_PROXY_TARGET || 'http://localhost:9827',
         changeOrigin: true
       },
       '/socket.io': {
-        target: process.env.BACKEND_PROXY_TARGET || 'http://localhost:9825',
+        target: process.env.BACKEND_PROXY_TARGET || 'http://localhost:9827',
         ws: true,
         changeOrigin: true
       }

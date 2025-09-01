@@ -216,7 +216,7 @@ DB_PATH=./data/homie.db
 
 # Server
 NODE_ENV=development
-PORT=9825
+PORT=9827
 API_PREFIX=/api
 
 # JWT
@@ -224,7 +224,7 @@ JWT_SECRET=your-super-secret-jwt-key
 JWT_EXPIRES_IN=7d
 
 # Frontend
-FRONTEND_URL=http://localhost:3000
+FRONTEND_URL=http://localhost:9826
 BASE_PATH=/homie
 
 # External Services Configuration
@@ -351,7 +351,7 @@ services:
 1. Clone the repository
 2. Run `scripts/setup.sh` to initialize development environment
 3. Start services with `docker compose -f docker/docker-compose.dev.yml up`
-4. Access frontend at `http://localhost:3000/homie`
+4. Access frontend at `http://localhost:9826/homie`
 
 ### Building for Production
 1. Run `scripts/build.sh` to build all components

@@ -56,7 +56,7 @@ export const useAuth = () => {
   return context;
 };
 
-const API_BASE = (import.meta as any).env?.VITE_API_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:9825');
+const API_BASE = (import.meta as any).env?.VITE_API_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:9827');
 
 // Configure axios defaults
 axios.defaults.baseURL = API_BASE;

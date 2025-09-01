@@ -46,11 +46,11 @@ npm run dev
 ```
 
 The application will be available at:
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:9825
+- Frontend: http://localhost:9826
+- Backend API: http://localhost:9827
 
 5. **Initial Setup:**
-- Navigate to http://localhost:5173
+- Navigate to http://localhost:9826
 - Create your admin account
 - Start adding services from the marketplace!
 
@@ -139,8 +139,8 @@ docker-compose -f docker-compose.dev.yml up -d
 ```
 
 The dev stack exposes:
-- Frontend dev server: `http://localhost:3000`
-- Backend API: `http://localhost:9825`
+- Frontend dev server: `http://localhost:9826`
+- Backend API: `http://localhost:9827`
 
 ### Production
 

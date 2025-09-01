@@ -102,7 +102,7 @@ setup_environment() {
 NODE_ENV=development
 
 # Backend Configuration
-PORT=9825
+PORT=9827
 BASE_PATH=
 API_PREFIX=/api
 DATABASE_URL=sqlite:///app/data/homie-dev.db
@@ -114,12 +114,12 @@ ENCRYPTION_KEY=dev-32-character-encryption-key!
 SESSION_SECRET=dev-session-secret
 
 # Frontend Configuration
-VITE_API_URL=http://localhost:9825
+VITE_API_URL=http://localhost:9827
 VITE_BASE_PATH=
-VITE_WS_URL=ws://localhost:9825
+VITE_WS_URL=ws://localhost:9827
 
 # CORS Configuration
-CORS_ORIGIN=http://localhost:3000
+CORS_ORIGIN=http://localhost:9826
 CORS_CREDENTIALS=true
 
 # Logging
@@ -169,11 +169,11 @@ start_backend() {
     print_header "Starting Backend Server"
     
     # Kill existing backend process
-    kill_port 9825
+    kill_port 9827
     
     cd "$SCRIPT_DIR/backend"
     
-    print_info "Starting backend with hot reload on port 9825..."
+    print_info "Starting backend with hot reload on port 9827..."
     
     # Start backend with nodemon for hot reload
     npx nodemon \
@@ -194,7 +194,7 @@ start_backend() {
     # Wait for backend to start
     print_info "Waiting for backend to start..."
     for i in {1..30}; do
-        if curl -f -s http://localhost:9825/health > /dev/null 2>&1; then
+        if curl -f -s http://localhost:9827/api/health > /dev/null 2>&1; then
             print_info "Backend started successfully ✓"
             break
         fi
@@ -207,16 +207,16 @@ start_frontend() {
     print_header "Starting Frontend Server"
     
     # Kill existing frontend process
-    kill_port 3000
+    kill_port 9826
     
     cd "$SCRIPT_DIR/frontend"
     
-    print_info "Starting frontend with hot reload on port 3000..."
+    print_info "Starting frontend with hot reload on port 9826..."
     
     # Start frontend with Vite
     npx vite \
         --host \
-        --port 3000 \
+        --port 9826 \
         --open \
         2>&1 | while IFS= read -r line; do
             echo -e "${CYAN}[FRONTEND]${NC} $line"
@@ -233,9 +233,9 @@ start_frontend() {
 show_status() {
     echo ""
     print_header "Development Servers Running"
-    echo -e "${GREEN}✓${NC} Backend:  ${BLUE}http://localhost:9825${NC}"
-    echo -e "${GREEN}✓${NC} Frontend: ${CYAN}http://localhost:3000${NC}"
-    echo -e "${GREEN}✓${NC} API Docs: ${BLUE}http://localhost:9825/api-docs${NC} (if enabled)"
+    echo -e "${GREEN}✓${NC} Backend:  ${BLUE}http://localhost:9827${NC}"
+    echo -e "${GREEN}✓${NC} Frontend: ${CYAN}http://localhost:9826${NC}"
+    echo -e "${GREEN}✓${NC} API Docs: ${BLUE}http://localhost:9827/api-docs${NC} (if enabled)"
     echo ""
     echo -e "${YELLOW}Hot Reload:${NC} Both servers will reload automatically on file changes"
     echo -e "${YELLOW}Logs:${NC} Backend logs in ${BLUE}blue${NC}, Frontend logs in ${CYAN}cyan${NC}"
@@ -264,8 +264,8 @@ cleanup() {
     fi
     
     # Kill any remaining processes on ports
-    kill_port 3000
-    kill_port 9825
+    kill_port 9826
+    kill_port 9827
     
     print_info "All servers stopped"
     exit 0
@@ -366,8 +366,8 @@ case "${1:-}" in
         echo "  • Graceful shutdown"
         echo ""
         echo "Ports:"
-        echo "  • Backend:  http://localhost:9825"
-        echo "  • Frontend: http://localhost:3000"
+        echo "  • Backend:  http://localhost:9827"
+        echo "  • Frontend: http://localhost:9826"
         echo ""
         exit 0
         ;;

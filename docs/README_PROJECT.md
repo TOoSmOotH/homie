@@ -74,8 +74,8 @@ The application follows a modern full-stack architecture:
    ```
 
 4. **Access the application**
-   - Frontend: http://localhost:3000/homie
-   - Backend API: http://localhost:9825/api
+   - Frontend: http://localhost:9826/homie
+   - Backend API: http://localhost:9827/api
 
 ### Production Deployment
 
@@ -140,7 +140,7 @@ DB_PATH=./data/homie.db
 
 # Server
 NODE_ENV=development
-PORT=9825
+PORT=9827
 API_PREFIX=/api
 
 # JWT
@@ -148,7 +148,7 @@ JWT_SECRET=your-super-secret-jwt-key
 JWT_EXPIRES_IN=7d
 
 # Frontend
-FRONTEND_URL=http://localhost:3000
+FRONTEND_URL=http://localhost:9826
 BASE_PATH=/homie
 
 ```

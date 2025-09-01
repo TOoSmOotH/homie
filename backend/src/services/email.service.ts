@@ -112,7 +112,7 @@ class EmailService {
       logger.info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       logger.info('PASSWORD RESET TOKEN (Email service not configured)');
       logger.info(`User: ${email}`);
-      logger.info(`Reset Link: ${process.env.FRONTEND_URL || 'http://localhost:3000'}/password-reset?token=${resetToken}`);
+      logger.info(`Reset Link: ${process.env.FRONTEND_URL || 'http://localhost:9826'}/password-reset?token=${resetToken}`);
       logger.info('Token expires in 1 hour');
       logger.info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       
@@ -128,7 +128,7 @@ class EmailService {
       return false;
     }
 
-    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/password-reset?token=${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:9826'}/password-reset?token=${resetToken}`;
 
     const mailOptions: EmailOptions = {
       to: email,
@@ -193,7 +193,7 @@ class EmailService {
       logger.info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       logger.info('EMAIL VERIFICATION TOKEN (Email service not configured)');
       logger.info(`User: ${email}`);
-      logger.info(`Verification Link: ${process.env.FRONTEND_URL || 'http://localhost:3000'}/verify-email?token=${verificationToken}`);
+      logger.info(`Verification Link: ${process.env.FRONTEND_URL || 'http://localhost:9826'}/verify-email?token=${verificationToken}`);
       logger.info('Token expires in 24 hours');
       logger.info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       
@@ -209,7 +209,7 @@ class EmailService {
       return false;
     }
 
-    const verifyUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/verify-email?token=${verificationToken}`;
+    const verifyUrl = `${process.env.FRONTEND_URL || 'http://localhost:9826'}/verify-email?token=${verificationToken}`;
 
     const mailOptions: EmailOptions = {
       to: email,
@@ -275,7 +275,7 @@ class EmailService {
         logger.info(`Username: ${username}`);
         logger.info(`Email: ${email}`);
         logger.info(`Temporary Password: ${tempPassword}`);
-        logger.info(`Login URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}/login`);
+        logger.info(`Login URL: ${process.env.FRONTEND_URL || 'http://localhost:9826'}/login`);
         logger.info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       }
       return true;
@@ -289,7 +289,7 @@ class EmailService {
       return false;
     }
 
-    const loginUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login`;
+    const loginUrl = `${process.env.FRONTEND_URL || 'http://localhost:9826'}/login`;
 
     const mailOptions: EmailOptions = {
       to: email,

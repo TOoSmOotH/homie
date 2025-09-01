@@ -8,7 +8,7 @@ import WebSocketService from './services/websocket.service';
 import { initializeServicesRoutes } from './routes/services.routes';
 import { marketplaceService } from './services/marketplace.service';
 
-const PORT = config.port || 9825;
+const PORT = config.port || 9827;
 let server: http.Server;
 let io: SocketServer;
 
@@ -30,7 +30,7 @@ async function startServer() {
     // Initialize Socket.io server
     io = new SocketServer(server, {
       cors: {
-        origin: process.env.FRONTEND_URL || "http://localhost:5173",
+        origin: process.env.FRONTEND_URL || "http://localhost:9826",
         methods: ["GET", "POST"],
         credentials: true
       },

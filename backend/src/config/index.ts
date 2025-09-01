@@ -25,15 +25,15 @@ export interface Config {
 
 export const config: Config = {
   nodeEnv: process.env.NODE_ENV || 'development',
-  port: parseInt(process.env.PORT || '9825', 10),
+  port: parseInt(process.env.PORT || '9827', 10),
   apiPrefix: process.env.API_PREFIX || '/api',
   dbPath: process.env.DB_PATH || './data/homie.db',
   jwtSecret: process.env.JWT_SECRET || 'fallback-secret-change-in-production',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
   logLevel: process.env.LOG_LEVEL || 'info',
   logFile: process.env.LOG_FILE || './logs/homie.log',
-  corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:3000',
-  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
+  corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:9826',
+  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:9826',
   basePath: process.env.BASE_PATH || '',
   features: {
     emailVerification: process.env.ENABLE_EMAIL_VERIFICATION === 'true', // Default false

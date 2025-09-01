@@ -18,10 +18,10 @@ services:
       context: ..
       dockerfile: docker/Dockerfile.frontend
     ports:
-      - "3000:3000"
+      - "9826:3000"
     environment:
       - NODE_ENV=development
-      - BACKEND_PROXY_TARGET=http://backend:9825
+      - BACKEND_PROXY_TARGET=http://backend:9827
     volumes:
       - ../frontend:/app/frontend
       - ../shared:/app/shared
