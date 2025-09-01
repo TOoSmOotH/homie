@@ -72,6 +72,9 @@ keys/
 # Database directories
 data/
 database/
+# Allow source code database folder
+!backend/src/database/
+!backend/src/database/**
 db/
 
 # Migration and seed files (runtime generated)
