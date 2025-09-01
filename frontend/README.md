@@ -105,9 +105,9 @@ The application is configured via environment variables and the `vite.config.ts`
 - `Header` - Application header with navigation
 - `Sidebar` - Navigation sidebar
 
-### Service Components
+### Service UI
 
-Organized by service type (Proxmox, Docker, Sonarr, etc.)
+The UI no longer includes built-in service dashboards or widgets. All service interactions are marketplace-driven via generic endpoints and configuration.
 
 ## API Integration
 

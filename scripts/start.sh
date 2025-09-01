@@ -29,9 +29,9 @@ start_backend() {
 
     # Wait for backend to be ready
     echo "⏳ Waiting for backend to start..."
-    BASE_PATH=${BASE_PATH:-/homie}
+    API_PREFIX=${API_PREFIX:-/api}
     for i in $(seq 1 30); do
-        if curl -f -s http://localhost:$PORT${BASE_PATH}/health > /dev/null 2>&1; then
+        if curl -f -s http://localhost:$PORT${API_PREFIX}/health > /dev/null 2>&1; then
             echo "✅ Backend started successfully"
             return 0
         fi
@@ -82,7 +82,7 @@ main() {
     echo "📋 Environment:"
     echo "   NODE_ENV: $NODE_ENV"
     echo "   PORT: $PORT"
-    echo "   BASE_PATH: ${BASE_PATH:-/homie}"
+    echo "   API_PREFIX: ${API_PREFIX:-/api}"
 
     # Start backend
     start_backend

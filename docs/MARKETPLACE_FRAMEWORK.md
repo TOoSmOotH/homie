@@ -103,8 +103,26 @@ Each service in the marketplace should be a complete, self-contained definition 
       }
     }
   },
+
+  // Example alternative transports
+  "api_alt": {
+    "endpoints": {
+      "docker_containers": {
+        "transport": "docker",
+        "method": "GET",
+        "path": "/containers/json",
+        "params": { "all": "true" }
+      },
+      "ssh_disk": {
+        "transport": "ssh",
+        "command": "df -h --output=pcent,/ | tail -n +2",
+        "parser": "text",
+        "timeout": 5000
+      }
+    }
+  },
   
-  // Dashboard Widgets
+  // Dashboard Widgets (optional)
   "widgets": [
     {
       "id": "download_queue",

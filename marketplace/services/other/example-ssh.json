@@ -1,0 +1,26 @@
+{
+  "id": "example-ssh",
+  "name": "Example SSH Service",
+  "version": "1.0.0",
+  "author": "Homie",
+  "description": "Demonstrates SSH transport endpoint",
+  "icon": "🔐",
+  "category": "other",
+  "connection": {
+    "type": "ssh",
+    "auth": "password|key",
+    "fields": [
+      { "key": "sshHost", "label": "Host", "type": "text", "required": true },
+      { "key": "sshPort", "label": "Port", "type": "number", "required": false, "placeholder": 22 },
+      { "key": "sshUsername", "label": "Username", "type": "text", "required": true },
+      { "key": "sshPassword", "label": "Password", "type": "password", "required": false },
+      { "key": "sshPrivateKey", "label": "Private Key", "type": "password", "required": false }
+    ]
+  },
+  "api": {
+    "endpoints": {
+      "disk_usage": { "transport": "ssh", "command": "df -h --output=pcent,/ | tail -n +2", "parser": "text", "timeout": 5000 }
+    }
+  }
+}
+

@@ -1,0 +1,27 @@
+{
+  "id": "example-docker",
+  "name": "Example Docker Service",
+  "version": "1.0.0",
+  "author": "Homie",
+  "description": "Demonstrates Docker socket transport endpoints",
+  "icon": "🐳",
+  "category": "other",
+  "connection": {
+    "type": "api",
+    "auth": "none",
+    "fields": [
+      { "key": "dockerSocketPath", "label": "Docker Socket Path", "type": "path", "required": false, "placeholder": "/var/run/docker.sock" }
+    ],
+    "testEndpoint": {
+      "path": "/version",
+      "method": "GET"
+    }
+  },
+  "api": {
+    "endpoints": {
+      "version": { "transport": "docker", "method": "GET", "path": "/version" },
+      "containers": { "transport": "docker", "method": "GET", "path": "/containers/json", "params": { "all": "true" } }
+    }
+  }
+}
+

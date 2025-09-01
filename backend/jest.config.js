@@ -1,6 +1,14 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
+  globals: {
+    'ts-jest': {
+      tsconfig: {
+        isolatedModules: true,
+        types: ['jest', 'node']
+      }
+    }
+  },
   roots: ['<rootDir>/src', '<rootDir>/tests'],
   testMatch: [
     '**/__tests__/**/*.ts',

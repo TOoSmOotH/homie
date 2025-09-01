@@ -22,7 +22,11 @@
     "docker:prod": "docker compose up",
     "docker:build": "docker compose build",
     "setup": "./scripts/setup.sh",
-    "clean": "rm -rf backend/dist frontend/dist shared/dist data/*.db node_modules/.cache"
+    "clean": "rm -rf backend/dist frontend/dist shared/dist data/*.db node_modules/.cache",
+    "release:patch": "npm version patch -m \"chore(release): %s\" && git push && git push --tags",
+    "release:minor": "npm version minor -m \"chore(release): %s\" && git push && git push --tags",
+    "release:major": "npm version major -m \"chore(release): %s\" && git push && git push --tags",
+    "release:prerelease": "npm version prerelease --preid=rc -m \"chore(release): %s\" && git push && git push --tags"
   },
   "devDependencies": {
     "@types/node": "^24.3.0",

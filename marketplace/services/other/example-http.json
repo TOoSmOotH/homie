@@ -1,0 +1,29 @@
+{
+  "id": "example-http",
+  "name": "Example HTTP Service",
+  "version": "1.0.0",
+  "author": "Homie",
+  "description": "Demonstrates HTTP transport endpoints",
+  "icon": "🌐",
+  "category": "other",
+  "connection": {
+    "type": "api",
+    "auth": "apikey",
+    "fields": [
+      { "key": "url", "label": "Base URL", "type": "url", "required": true },
+      { "key": "api_key", "label": "API Key", "type": "password", "required": true }
+    ],
+    "testEndpoint": {
+      "path": "/api/status",
+      "method": "GET",
+      "expectedStatus": 200
+    }
+  },
+  "api": {
+    "headers": { "Authorization": "Bearer {api_key}" },
+    "endpoints": {
+      "status": { "transport": "http", "method": "GET", "path": "/api/status" }
+    }
+  }
+}
+

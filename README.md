@@ -142,15 +142,100 @@ docker-compose up -d
 docker-compose -f docker-compose.prod.yml up -d
 ```
 
+### Fresh Instance Behavior
+- Database: The backend auto-creates the SQLite database at `DB_PATH` on first start; parent directories are created if missing.
+- Admin bootstrap: On a brand-new instance (no admin users), the frontend redirects to `/setup` and calls `POST /api/auth/setup-admin` so the first connecting user can create the admin account.
+- Services: The production container does not include local marketplace service definitions. It pulls all service definitions from the remote marketplace on startup and periodically thereafter.
+
+Key environment variables:
+- `DB_PATH` (default `/app/data/homie.db` in Docker)
+- `MARKETPLACE_DISABLE_LOCAL` (default true in production)
+- `MARKETPLACE_REPO_URL` (override remote marketplace base URL)
+- `MARKETPLACE_AUTO_SYNC` (default true)
+- `MARKETPLACE_SYNC_INTERVAL` (minutes; default 60)
+
 ### Environment Variables for Docker
 
 ```yaml
 environment:
   - NODE_ENV=production
-  - DATABASE_PATH=/data/homie.db
+  - DB_PATH=/app/data/homie.db
   - JWT_SECRET=${JWT_SECRET}
   - MARKETPLACE_REPO_URL=${MARKETPLACE_REPO_URL}
+  - MARKETPLACE_DISABLE_LOCAL=true
 ```
+
+### Using GHCR-hosted Image
+
+You can run Homie directly from GitHub Container Registry without building locally. Images are published under `ghcr.io/TOoSmOotH/homie`.
+
+Pull and run with Docker:
+
+```bash
+docker pull ghcr.io/TOoSmOotH/homie:latest
+docker run -d \
+  --name homie \
+  -p 80:80 -p 443:443 \
+  -e NODE_ENV=production \
+  -e DB_PATH=/app/data/homie.db \
+  -e JWT_SECRET=change-me \
+  -e MARKETPLACE_DISABLE_LOCAL=true \
+  -v $(pwd)/data:/app/data \
+  -v $(pwd)/logs:/app/logs \
+  ghcr.io/TOoSmOotH/homie:latest
+```
+
+Or with Docker Compose (image-based):
+
+```yaml
+services:
+  homie:
+    image: ghcr.io/TOoSmOotH/homie:latest
+    container_name: homie
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - DB_PATH=/app/data/homie.db
+      - JWT_SECRET=${JWT_SECRET}
+      - MARKETPLACE_DISABLE_LOCAL=true
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./ssl:/etc/letsencrypt
+```
+
+## 🔖 Versioning & Releases
+
+This repo uses semantic version tags to drive container publishing to GHCR. When you push a tag like `v1.2.3`, GitHub Actions builds and publishes the image.
+
+Convenience scripts (from repo root):
+
+```bash
+# bump and tag a patch release, push branch + tags
+npm run release:patch
+
+# minor or major release
+npm run release:minor
+npm run release:major
+
+# prerelease (e.g., v1.2.4-rc.0)
+npm run release:prerelease
+```
+
+Publishing is handled by `.github/workflows/publish.yml`. Images are pushed to `ghcr.io/TOoSmOotH/homie` with tags for latest, branch, tag, and commit SHA.
+
+## 📦 Publishing to GHCR
+
+Pushing to `main` or a version tag builds and publishes the production image to GitHub Container Registry (GHCR) via GitHub Actions.
+
+- Image: `ghcr.io/<org-or-user>/homie`
+- Tags: `latest` (on default branch), branch name, tag, and commit SHA
+- Workflow: `.github/workflows/publish.yml`
+
+No extra secrets are required; it uses the default `GITHUB_TOKEN` with `packages: write` permission.
 
 ## 🔌 Adding Services to the Marketplace
 

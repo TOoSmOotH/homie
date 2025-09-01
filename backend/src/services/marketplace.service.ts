@@ -21,7 +21,8 @@ export class MarketplaceService {
     this.config = {
       localPath: config.localPath || path.join(process.cwd(), '..', 'marketplace'),
       remoteUrl: config.remoteUrl || process.env.MARKETPLACE_REPO_URL || 'https://raw.githubusercontent.com/TOoSmOotH/homie/main',
-      autoSync: config.autoSync !== undefined ? config.autoSync : (process.env.MARKETPLACE_AUTO_SYNC === 'true' || true),
+      // Always enable auto-sync by default so fresh instances pull from marketplace
+      autoSync: config.autoSync !== undefined ? config.autoSync : (process.env.MARKETPLACE_AUTO_SYNC ? process.env.MARKETPLACE_AUTO_SYNC === 'true' : true),
       syncInterval: config.syncInterval || parseInt(process.env.MARKETPLACE_SYNC_INTERVAL || '60', 10) // Default: sync every hour
     };
   }
@@ -40,8 +41,13 @@ export class MarketplaceService {
     try {
       logger.info('Initializing marketplace service...');
       
-      // Load local marketplace definitions
-      await this.loadLocalDefinitions();
+      // In production or when explicitly disabled, skip loading local marketplace files
+      const disableLocal = process.env.MARKETPLACE_DISABLE_LOCAL === 'true' || process.env.NODE_ENV === 'production';
+      if (disableLocal) {
+        logger.info('Skipping local marketplace loading (production or disabled)');
+      } else {
+        await this.loadLocalDefinitions();
+      }
       
       // Start auto-sync if enabled
       if (this.config.autoSync) {

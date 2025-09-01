@@ -18,8 +18,8 @@ if ! pgrep -f "node.*server.js" > /dev/null; then
 fi
 
 # Check if backend is responding
-BASE_PATH=${BASE_PATH:-/homie}
-if ! curl -f -s http://localhost:3001${BASE_PATH}/health > /dev/null 2>&1; then
+API_PREFIX=${API_PREFIX:-/api}
+if ! curl -f -s http://localhost:3001${API_PREFIX}/health > /dev/null 2>&1; then
     echo "❌ Backend health endpoint is not responding"
     exit 1
 fi

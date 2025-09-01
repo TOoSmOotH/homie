@@ -29,7 +29,11 @@
   "exclude": [
     "node_modules",
     "dist",
-    "tests"
+    "tests",
+    "src/legacy/**",
+    "src/services/adapters/**",
+    "src/controllers/radarr.controller.ts",
+    "src/controllers/services.controller.ts"
   ],
   "ts-node": {
     "esm": false,

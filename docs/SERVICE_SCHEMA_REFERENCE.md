@@ -101,18 +101,31 @@
 {
   "endpoints": {
     "endpoint_name": {
-      "path": "/api/path",           // Required
-      "method": "GET|POST|PUT|DELETE", // Default: GET
-      "params": {},                   // Query parameters
-      "body": {},                     // Request body
-      "headers": {},                  // Additional headers
-      "refresh": 30000,               // Auto-refresh (ms)
-      "cache": 60000,                 // Cache duration (ms)
-      "transform": "response.data"    // Data transformation
+      "transport": "http|docker|ssh|ws", // Default: http
+      "path": "/api/path",              // For http/docker/ws
+      "method": "GET|POST|PUT|DELETE",  // http/docker/ws; default GET
+      "params": {},                      // Query parameters (http/docker)
+      "body": {},                        // Request body (http/docker)
+      "headers": {},                     // Additional headers (http/ws)
+      "url": "wss://host/path",          // Optional explicit WS URL
+      "message": "{payload}",            // WS message to send after connect
+      "timeout": 5000,                   // WS/SSH timeout (ms)
+      "command": "cat /etc/app.json",    // SSH command
+      "parser": "json|text",            // SSH/WS response parser
+      "allowNonZeroExit": false,         // SSH: allow non-zero exit codes
+      "refresh": 30000,                  // Auto-refresh (ms)
+      "cache": 60000,                    // Cache duration (ms)
+      "transform": "response"            // Data transformation function body
     }
   }
 }
 ```
+
+### Transports
+- http: Default REST over service-configured URL. Interpolates `headers` and `params` from instance config.
+- docker: Calls Docker Engine API via unix socket at `/var/run/docker.sock` (or `DOCKER_SOCKET`). Use read-only endpoints unless strictly necessary.
+- ssh: Executes a manifest-defined `command` via SSH using instance credentials (`sshHost/host`, `sshPort`, `sshUsername/username`, and either `sshPassword` or `sshPrivateKey`). `parser` may be `json` to parse stdout.
+- ws: Connects to a WebSocket URL (`url` or derived from `service.config.url` + `path`). Optionally sends `message` and returns first response. `parser` may be `json`.
 
 ## Widget Types
 

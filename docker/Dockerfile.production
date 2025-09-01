@@ -74,6 +74,9 @@ RUN apk add --no-cache --virtual .build-deps python3 py3-setuptools make g++ && 
     npm ci --omit=dev && \
     apk del .build-deps
 
+# Ensure marketplace is remote-only in production
+ENV MARKETPLACE_DISABLE_LOCAL=true 
+
 # Copy built backend
 COPY --from=backend-builder --chown=appuser:appuser /app/backend/dist ./backend/dist
 COPY --from=backend-builder --chown=appuser:appuser /app/shared/dist ./shared/dist
