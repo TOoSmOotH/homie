@@ -23,6 +23,8 @@
     "docker:build": "docker compose build",
     "setup": "./scripts/setup.sh",
     "clean": "rm -rf backend/dist frontend/dist shared/dist data/*.db node_modules/.cache",
+    "test:docker:backend": "bash scripts/test-docker-backend.sh",
+    "test:docker:backend:tsc": "bash scripts/test-docker-backend.sh --tsc-only",
     "release:patch": "npm version patch -m \"chore(release): %s\" && git push && git push --tags",
     "release:minor": "npm version minor -m \"chore(release): %s\" && git push && git push --tags",
     "release:major": "npm version major -m \"chore(release): %s\" && git push && git push --tags",
