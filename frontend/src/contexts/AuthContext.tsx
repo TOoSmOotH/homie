@@ -56,7 +56,7 @@ export const useAuth = () => {
   return context;
 };
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:9825';
 
 // Configure axios defaults
 axios.defaults.baseURL = API_BASE;

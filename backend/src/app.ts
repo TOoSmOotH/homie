@@ -14,6 +14,7 @@ import { dashboardRoutes } from './routes/dashboard.routes';
 import { marketplaceRoutes } from './routes/marketplace.routes';
 import serviceDataRoutes from './routes/service-data.routes';
 import { logger } from './utils/logger';
+import path from 'path';
 import { config } from './config';
 
 const app = express();
@@ -82,6 +83,16 @@ app.get(`${config.apiPrefix}/health`, (req, res) => {
     }
   });
 });
+
+// Serve frontend in production at /homie
+if (config.nodeEnv === 'production') {
+  const staticDir = path.resolve(__dirname, 'public');
+  app.use('/homie', express.static(staticDir));
+  // SPA fallback
+  app.get('/homie/*', (_req, res) => {
+    res.sendFile(path.join(staticDir, 'index.html'));
+  });
+}
 
 // Root endpoint
 app.get('/', (req, res) => {

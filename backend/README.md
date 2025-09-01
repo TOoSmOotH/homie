@@ -96,7 +96,7 @@ Copy `.env.example` to `.env` and configure:
 
 ```bash
 NODE_ENV=development
-PORT=3001
+PORT=9825
 DB_PATH=./data/homie.db
 JWT_SECRET=your-secret-key
 LOG_LEVEL=info

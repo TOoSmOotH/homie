@@ -102,8 +102,8 @@ This document outlines the development plan for creating a web-based home lab ma
 
 ### Milestone 5.2: Deployment Setup
 - [ ] Create deployment scripts
-- [ ] Set up reverse proxy configuration (Nginx)
-- [ ] Implement SSL certificate setup
+- [ ] Document reverse proxy configuration (Nginx/Traefik/Caddy)
+- [ ] Configure TLS at reverse proxy (container remains HTTP-only)
 - [ ] Create backup and restore procedures
 
 ### Milestone 5.3: Documentation

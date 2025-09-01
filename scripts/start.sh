@@ -2,11 +2,11 @@
 
 set -e
 
-echo "🚀 Starting Homie production application..."
+echo "🚀 Starting Homie production application (no nginx)..."
 
 # Set environment variables
 export NODE_ENV=${NODE_ENV:-production}
-export PORT=${PORT:-3001}
+export PORT=${PORT:-9825}
 export API_PREFIX=${API_PREFIX:-/api}
 
 # Create necessary directories with proper permissions
@@ -42,34 +42,13 @@ start_backend() {
     exit 1
 }
 
-# Function to start nginx
-start_nginx() {
-    echo "🌐 Starting nginx..."
-
-    # Use HTTP configuration (SSL can be handled by reverse proxy)
-    NGINX_CONF="/etc/nginx/nginx.conf"
-    echo "🔓 Using HTTP configuration"
-
-    # Test nginx configuration
-    nginx -t -c "$NGINX_CONF"
-    if [ $? -ne 0 ]; then
-        echo "❌ Nginx configuration test failed"
-        exit 1
-    fi
-
-    # Start nginx
-    nginx -c "$NGINX_CONF" -g 'daemon off;' &
-    NGINX_PID=$!
-}
+# (nginx removed; served by backend)
 
 # Function to handle shutdown
 shutdown() {
     echo "🛑 Shutting down services..."
     if [ ! -z "$BACKEND_PID" ]; then
         kill $BACKEND_PID 2>/dev/null || true
-    fi
-    if [ ! -z "$NGINX_PID" ]; then
-        kill $NGINX_PID 2>/dev/null || true
     fi
     exit 0
 }
@@ -87,15 +66,12 @@ main() {
     # Start backend
     start_backend
 
-    # Start nginx
-    start_nginx
-
     echo "✅ Homie application started successfully!"
     echo "📊 Backend: http://localhost:$PORT"
-    echo "🌐 Frontend: http://localhost/homie"
+    echo "🌐 Frontend: http://localhost:${PORT}/homie"
 
     # Wait for processes
-    wait $BACKEND_PID $NGINX_PID
+    wait $BACKEND_PID
 }
 
 # Run main function

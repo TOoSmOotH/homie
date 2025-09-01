@@ -1,13 +1,13 @@
 # Homie Production Deployment Guide
 
-This guide covers the complete production deployment process for Homie, including Docker containerization, SSL setup, security hardening, monitoring, and maintenance procedures.
+This guide covers the complete production deployment process for Homie with a simplified container: a single HTTP port is exposed by the app, and TLS/SSL is handled by your external reverse proxy (e.g., Nginx, Traefik, Caddy). No web server runs inside the container.
 
 ## Table of Contents
 
 1. [Prerequisites](#prerequisites)
 2. [Quick Start](#quick-start)
 3. [Configuration](#configuration)
-4. [SSL/HTTPS Setup](#sslhttps-setup)
+4. [Reverse Proxy & TLS](#reverse-proxy--tls)
 5. [Deployment](#deployment)
 6. [Monitoring & Health Checks](#monitoring--health-checks)
 7. [Backup & Restore](#backup--restore)
@@ -22,7 +22,7 @@ This guide covers the complete production deployment process for Homie, includin
 - **Operating System**: Linux (Ubuntu 20.04+ recommended)
 - **Memory**: Minimum 1GB RAM, 2GB recommended
 - **Storage**: 10GB free space for application and data
-- **Network**: Public IP address (for SSL) or domain name
+- **Network**: Public IP address and/or domain name (TLS terminated by your proxy)
 
 ### Required Software
 
@@ -68,12 +68,9 @@ chmod +x scripts/deploy.sh
 ./scripts/deploy.sh --build --deploy
 ```
 
-### 3. Setup SSL (Optional but Recommended)
+### 3. Configure Reverse Proxy TLS
 
-```bash
-# Setup SSL certificates
-./scripts/deploy.sh --ssl-setup
-```
+Terminate TLS at your reverse proxy and forward HTTP to the Homie container on port 9825. See Reverse Proxy & TLS below for examples.
 
 ## Configuration
 
@@ -85,14 +82,14 @@ Copy `.env.production` and configure the following critical variables:
 # Required
 NODE_ENV=production
 DOMAIN=your-domain.com
-ENABLE_SSL=true
+PORT=9825
 
 # Security (Generate strong secrets)
 JWT_SECRET=your-64-character-random-string
 SESSION_SECRET=your-32-character-random-string
 
-# Email for SSL certificates
-SSL_EMAIL=admin@your-domain.com
+# Reverse proxy
+# Configure TLS on your proxy; container stays HTTP-only
 ```
 
 ### Docker Configuration
@@ -103,48 +100,56 @@ The production setup uses a single optimized container with:
 - **Security hardening** with non-root user
 - **Health checks** for service monitoring
 - **Resource limits** for stability
-- **SSL termination** with Let's Encrypt
+- Single HTTP port (9825) with TLS handled by your reverse proxy
 
 ### Network Configuration
 
 - **Internal**: Services communicate via Docker networks
-- **External**: HTTP (80) and HTTPS (443) ports exposed
+- **External**: Expose a single HTTP port (default host port 9825 mapped to container 9825); terminate TLS on your proxy
 - **WebSocket**: Support for real-time features
 
-## SSL/HTTPS Setup
+## Reverse Proxy & TLS
 
-### Automatic SSL with Let's Encrypt
+Homie serves HTTP on container port 9825. Configure your reverse proxy to terminate TLS and forward traffic to the container.
 
-```bash
-# Setup SSL certificates
-./scripts/deploy.sh --ssl-setup
+Example Nginx configuration:
 
-# Renew certificates (typically runs automatically)
-./scripts/deploy.sh --ssl-renew
+```nginx
+upstream homie {
+  server homie:9825;
+}
+
+server {
+  listen 80;
+  server_name your-domain.com;
+  return 301 https://$host$request_uri;
+}
+
+server {
+  listen 443 ssl http2;
+  server_name your-domain.com;
+  # ssl_certificate /path/to/fullchain.pem;
+  # ssl_certificate_key /path/to/privkey.pem;
+
+  location /homie/ {
+    proxy_pass http://homie/homie/;
+  }
+
+  location /api/ {
+    proxy_pass http://homie/api/;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+  }
+
+  location /socket.io/ {
+    proxy_pass http://homie/socket.io/;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+  }
+}
 ```
-
-### Manual SSL Configuration
-
-If you prefer to use your own certificates:
-
-1. Place your certificates in `./ssl/` directory:
-   ```
-   ssl/
-   ├── fullchain.pem
-   └── privkey.pem
-   ```
-
-2. Set environment variables:
-   ```bash
-   SSL_CERT_PATH=/etc/letsencrypt/live/your-domain.com/fullchain.pem
-   SSL_KEY_PATH=/etc/letsencrypt/live/your-domain.com/privkey.pem
-   ```
-
-### SSL Certificate Management
-
-- **Automatic renewal**: Certificates renew automatically every 60 days
-- **Manual renewal**: Use `./scripts/deploy.sh --ssl-renew`
-- **Certificate location**: `/etc/letsencrypt/live/your-domain.com/`
 
 ## Deployment
 
@@ -193,8 +198,8 @@ docker compose logs
 
 ### Health Check Endpoints
 
-- **Application Health**: `https://your-domain.com/health`
-- **API Health**: `https://your-domain.com/api/health`
+- Application Health: `http(s)://your-domain.com/homie` (serves SPA)
+- API Health: `http(s)://your-domain.com/api/health`
 
 ### Monitoring Commands
 
@@ -205,8 +210,8 @@ docker compose ps
 # View resource usage
 docker stats $(docker compose ps -q)
 
-# Check health endpoint
-curl -f https://your-domain.com/health
+# Check API health endpoint
+curl -f http(s)://your-domain.com/api/health
 
 # View logs
 docker compose logs -f --tail=100
@@ -214,9 +219,8 @@ docker compose logs -f --tail=100
 
 ### Log Files
 
-- **Application Logs**: `./logs/homie.log`
-- **Nginx Access Logs**: `/var/log/nginx/access.log`
-- **Nginx Error Logs**: `/var/log/nginx/error.log`
+- Application Logs: `./logs/homie.log`
+- Proxy Logs: Managed by your reverse proxy (outside container)
 
 ### Resource Monitoring
 
@@ -315,17 +319,16 @@ docker compose logs homie
 docker compose exec homie /app/healthcheck.sh
 ```
 
-#### 2. SSL Certificate Issues
+#### 2. TLS/SSL Issues
+
+TLS is terminated at your reverse proxy. Verify proxy certificate configuration and logs. Common checks:
 
 ```bash
-# Check certificate validity
-openssl x509 -in /etc/letsencrypt/live/your-domain.com/fullchain.pem -text -noout
+# Confirm proxy forwards to container
+curl -I http://localhost:9825/api/health
 
-# Renew certificates
-./scripts/deploy.sh --ssl-renew
-
-# Check certificate permissions
-ls -la /etc/letsencrypt/live/your-domain.com/
+# Check proxy access/error logs
+journalctl -u nginx -n 100 --no-pager  # or your proxy
 ```
 
 #### 3. Database Connection Issues
@@ -439,13 +442,9 @@ LATEST_BACKUP=$(ls -t ./backups/homie_backup_*.tar.gz | head -1)
 ./scripts/restore.sh "$LATEST_BACKUP" --force
 ```
 
-#### 3. SSL Emergency
+#### 3. Proxy Emergency
 
-```bash
-# Disable SSL temporarily
-echo "ENABLE_SSL=false" >> .env.production
-docker compose restart
-```
+Fallback to HTTP by routing around TLS at the proxy if needed; the container remains unchanged.
 
 ### Monitoring & Alerts
 
@@ -482,18 +481,21 @@ For high availability, use a load balancer:
 ```nginx
 # Load balancer configuration
 upstream homie_backend {
-    server homie1:80;
-    server homie2:80;
+    server homie1:9825;
+    server homie2:9825;
 }
 
 server {
-    listen 80;
+    listen 443 ssl http2;
     server_name your-domain.com;
 
-    location / {
-        proxy_pass http://homie_backend;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
+    location /homie/ { proxy_pass http://homie_backend/homie/; }
+    location /api/   { proxy_pass http://homie_backend/api/; }
+    location /socket.io/ {
+      proxy_pass http://homie_backend/socket.io/;
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
     }
 }
 ```
@@ -533,7 +535,7 @@ Use this checklist for production deployments:
 - [ ] Server requirements met (CPU, RAM, storage)
 - [ ] Domain name configured and DNS updated
 - [ ] Environment variables configured
-- [ ] SSL certificates obtained
+- [ ] Reverse proxy configured with TLS
 - [ ] Backup strategy implemented
 - [ ] Monitoring and alerting configured
 - [ ] Security hardening applied
@@ -545,7 +547,7 @@ Use this checklist for production deployments:
 ### v1.0.0
 - Initial production deployment guide
 - Single-container Docker setup
-- SSL/HTTPS with Let's Encrypt
+- Reverse proxy TLS in front of single-port container
 - Automated backup and restore
 - Health checks and monitoring
 - Security hardening

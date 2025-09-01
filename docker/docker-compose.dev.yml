@@ -6,7 +6,7 @@ services:
       context: ..
       dockerfile: docker/Dockerfile.backend
     ports:
-      - "3001:3001"
+      - "9825:9825"
     environment:
       - NODE_ENV=development
     volumes:

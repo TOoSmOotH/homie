@@ -216,7 +216,7 @@ DB_PATH=./data/homie.db
 
 # Server
 NODE_ENV=development
-PORT=3001
+PORT=9825
 API_PREFIX=/api
 
 # JWT
@@ -298,7 +298,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile.backend
     ports:
-      - "3001:3001"
+      - "9825:9825"
     environment:
       - NODE_ENV=development
     volumes:

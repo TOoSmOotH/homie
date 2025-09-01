@@ -45,7 +45,8 @@ export class WebSocketService {
   private setupSocket() {
     const token = localStorage.getItem('authToken');
 
-    this.socket = io('http://localhost:3001', {
+    const wsUrl = (import.meta as any).env?.VITE_WS_URL || (typeof window !== 'undefined' ? `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.hostname}:9825` : 'ws://localhost:9825');
+    this.socket = io(wsUrl, {
       path: '/socket.io',
       auth: {
         token: token

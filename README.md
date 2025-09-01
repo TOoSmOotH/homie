@@ -47,7 +47,7 @@ npm run dev
 
 The application will be available at:
 - Frontend: http://localhost:5173
-- Backend API: http://localhost:3001
+- Backend API: http://localhost:9825
 
 5. **Initial Setup:**
 - Navigate to http://localhost:5173
@@ -98,7 +98,7 @@ Create a `backend/.env` file with:
 ```env
 # Server Configuration
 NODE_ENV=development
-PORT=3001
+PORT=9825
 
 # Database
 DATABASE_PATH=./data/homie.db
@@ -130,17 +130,25 @@ The marketplace automatically syncs service definitions from GitHub:
 
 ## 🐳 Docker Deployment
 
+Homie now exposes a single HTTP port. TLS/SSL should be terminated by your reverse proxy. The container does not run nginx and serves the SPA at `/homie` directly from the backend.
+
 ### Development
+
+```bash
+docker-compose -f docker-compose.dev.yml up -d
+```
+
+The dev stack exposes:
+- Frontend dev server: `http://localhost:3000`
+- Backend API: `http://localhost:9825`
+
+### Production
 
 ```bash
 docker-compose up -d
 ```
 
-### Production
-
-```bash
-docker-compose -f docker-compose.prod.yml up -d
-```
+Production exposes the backend on container port `9825`. The default compose maps `${HTTP_PORT:-9825}` on the host to `9825` in the container. The backend serves the built frontend at `/homie` and the API at `/api`.
 
 ### Fresh Instance Behavior
 - Database: The backend auto-creates the SQLite database at `DB_PATH` on first start; parent directories are created if missing.
@@ -175,8 +183,9 @@ Pull and run with Docker:
 docker pull ghcr.io/TOoSmOotH/homie:latest
 docker run -d \
   --name homie \
-  -p 80:80 -p 443:443 \
+  -p 9825:9825 \
   -e NODE_ENV=production \
+  -e PORT=9825 \
   -e DB_PATH=/app/data/homie.db \
   -e JWT_SECRET=change-me \
   -e MARKETPLACE_DISABLE_LOCAL=true \
@@ -199,12 +208,38 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - MARKETPLACE_DISABLE_LOCAL=true
     ports:
-      - "80:80"
-      - "443:443"
+      - "9825:9825"
     volumes:
       - ./data:/app/data
       - ./logs:/app/logs
-      - ./ssl:/etc/letsencrypt
+
+### Reverse Proxy
+
+Terminate TLS in your proxy and forward to the container over HTTP:
+
+- Frontend: proxy `/<your-base>/homie` to `http://<container>:9825/homie`
+- API: proxy `/api` to `http://<container>:9825/api`
+- WebSocket: proxy `/socket.io` to `http://<container>:9825/socket.io` with upgrade headers
+
+Example Nginx location blocks:
+
+```nginx
+location /homie/ {
+  proxy_pass http://homie:9825/homie/;
+}
+location /api/ {
+  proxy_pass http://homie:9825/api/;
+  proxy_http_version 1.1;
+  proxy_set_header Upgrade $http_upgrade;
+  proxy_set_header Connection "upgrade";
+}
+location /socket.io/ {
+  proxy_pass http://homie:9825/socket.io/;
+  proxy_http_version 1.1;
+  proxy_set_header Upgrade $http_upgrade;
+  proxy_set_header Connection "upgrade";
+}
+```
 ```
 
 ## 🔖 Versioning & Releases

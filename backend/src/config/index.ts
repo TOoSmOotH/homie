@@ -25,7 +25,7 @@ export interface Config {
 
 export const config: Config = {
   nodeEnv: process.env.NODE_ENV || 'development',
-  port: parseInt(process.env.PORT || '3001', 10),
+  port: parseInt(process.env.PORT || '9825', 10),
   apiPrefix: process.env.API_PREFIX || '/api',
   dbPath: process.env.DB_PATH || './data/homie.db',
   jwtSecret: process.env.JWT_SECRET || 'fallback-secret-change-in-production',

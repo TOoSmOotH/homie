@@ -17,7 +17,7 @@ services:
     # Port configuration
     ports:
       - "3000:3000"     # Frontend dev server
-      - "3001:3001"     # Backend API
+      - "9825:9825"     # Backend API
       - "9229:9229"     # Node.js debugger
 
     # Volume mounts for development (with hot reload)

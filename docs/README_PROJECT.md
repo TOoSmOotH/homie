@@ -40,7 +40,7 @@ The application follows a modern full-stack architecture:
 ### Deployment
 - Single Docker container for production
 - Multi-container setup for development
-- Nginx reverse proxy support with `/homie` path prefix
+- Designed to sit behind a reverse proxy; SPA served at `/homie`
 
 ## 🛠️ Quick Start
 
@@ -75,7 +75,7 @@ The application follows a modern full-stack architecture:
 
 4. **Access the application**
    - Frontend: http://localhost:3000/homie
-   - Backend API: http://localhost:3001/api
+   - Backend API: http://localhost:9825/api
 
 ### Production Deployment
 
@@ -89,12 +89,16 @@ The application follows a modern full-stack architecture:
    npm run docker:prod
    ```
 
-3. **Configure reverse proxy** (optional)
+3. **Configure reverse proxy** (recommended for TLS)
    ```nginx
-   location /homie {
-       proxy_pass http://localhost:8080;
-       proxy_set_header Host $host;
-       proxy_set_header X-Real-IP $remote_addr;
+   # Forward to container on :9825
+   location /homie/ { proxy_pass http://homie:9825/homie/; }
+   location /api/   { proxy_pass http://homie:9825/api/; }
+   location /socket.io/ {
+     proxy_pass http://homie:9825/socket.io/;
+     proxy_http_version 1.1;
+     proxy_set_header Upgrade $http_upgrade;
+     proxy_set_header Connection "upgrade";
    }
    ```
 
@@ -136,7 +140,7 @@ DB_PATH=./data/homie.db
 
 # Server
 NODE_ENV=development
-PORT=3001
+PORT=9825
 API_PREFIX=/api
 
 # JWT
@@ -254,15 +258,7 @@ PUT  /api/config/preferences
 
 ### Single Container (Production)
 
-```dockerfile
-FROM node:18-alpine
-COPY . /app
-WORKDIR /app
-RUN npm install
-RUN npm run build
-EXPOSE 80
-CMD ["npm", "start"]
-```
+Serves API and SPA from the backend on port `9825`. Use an external reverse proxy for TLS.
 
 ### Multi-Container (Development)
 
@@ -271,7 +267,7 @@ version: '3.8'
 services:
   backend:
     build: ./backend
-    ports: ["3001:3001"]
+    ports: ["9825:9825"]
   frontend:
     build: ./frontend
     ports: ["3000:3000"]

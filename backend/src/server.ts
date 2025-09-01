@@ -8,7 +8,7 @@ import WebSocketService from './services/websocket.service';
 import { initializeServicesRoutes } from './routes/services.routes';
 import { marketplaceService } from './services/marketplace.service';
 
-const PORT = config.port || 3001;
+const PORT = config.port || 9825;
 let server: http.Server;
 let io: SocketServer;
 

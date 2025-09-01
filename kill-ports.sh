@@ -8,7 +8,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m'
 
 # Default ports
-DEFAULT_PORTS=(3000 3001 5173 5174 8080 9229)
+DEFAULT_PORTS=(3000 9825 5173 5174 8080 9229)
 
 # Function to kill process on a port
 kill_port() {

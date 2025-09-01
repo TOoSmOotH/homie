@@ -102,7 +102,7 @@ setup_environment() {
 NODE_ENV=development
 
 # Backend Configuration
-PORT=3001
+PORT=9825
 BASE_PATH=
 API_PREFIX=/api
 DATABASE_URL=sqlite:///app/data/homie-dev.db
@@ -114,9 +114,9 @@ ENCRYPTION_KEY=dev-32-character-encryption-key!
 SESSION_SECRET=dev-session-secret
 
 # Frontend Configuration
-VITE_API_URL=http://localhost:3001
+VITE_API_URL=http://localhost:9825
 VITE_BASE_PATH=
-VITE_WS_URL=ws://localhost:3001
+VITE_WS_URL=ws://localhost:9825
 
 # CORS Configuration
 CORS_ORIGIN=http://localhost:3000
@@ -169,11 +169,11 @@ start_backend() {
     print_header "Starting Backend Server"
     
     # Kill existing backend process
-    kill_port 3001
+    kill_port 9825
     
     cd "$SCRIPT_DIR/backend"
     
-    print_info "Starting backend with hot reload on port 3001..."
+    print_info "Starting backend with hot reload on port 9825..."
     
     # Start backend with nodemon for hot reload
     npx nodemon \
@@ -194,7 +194,7 @@ start_backend() {
     # Wait for backend to start
     print_info "Waiting for backend to start..."
     for i in {1..30}; do
-        if curl -f -s http://localhost:3001/health > /dev/null 2>&1; then
+        if curl -f -s http://localhost:9825/health > /dev/null 2>&1; then
             print_info "Backend started successfully ✓"
             break
         fi
@@ -233,9 +233,9 @@ start_frontend() {
 show_status() {
     echo ""
     print_header "Development Servers Running"
-    echo -e "${GREEN}✓${NC} Backend:  ${BLUE}http://localhost:3001${NC}"
+    echo -e "${GREEN}✓${NC} Backend:  ${BLUE}http://localhost:9825${NC}"
     echo -e "${GREEN}✓${NC} Frontend: ${CYAN}http://localhost:3000${NC}"
-    echo -e "${GREEN}✓${NC} API Docs: ${BLUE}http://localhost:3001/api-docs${NC} (if enabled)"
+    echo -e "${GREEN}✓${NC} API Docs: ${BLUE}http://localhost:9825/api-docs${NC} (if enabled)"
     echo ""
     echo -e "${YELLOW}Hot Reload:${NC} Both servers will reload automatically on file changes"
     echo -e "${YELLOW}Logs:${NC} Backend logs in ${BLUE}blue${NC}, Frontend logs in ${CYAN}cyan${NC}"
@@ -265,7 +265,7 @@ cleanup() {
     
     # Kill any remaining processes on ports
     kill_port 3000
-    kill_port 3001
+    kill_port 9825
     
     print_info "All servers stopped"
     exit 0
@@ -366,7 +366,7 @@ case "${1:-}" in
         echo "  • Graceful shutdown"
         echo ""
         echo "Ports:"
-        echo "  • Backend:  http://localhost:3001"
+        echo "  • Backend:  http://localhost:9825"
         echo "  • Frontend: http://localhost:3000"
         echo ""
         exit 0

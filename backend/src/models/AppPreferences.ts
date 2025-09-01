@@ -37,7 +37,7 @@ export class AppPreferences {
   appDescription?: string;
 
   // Server configuration
-  @Column({ type: 'int', default: 3001 })
+  @Column({ type: 'int', default: 9825 })
   defaultPort!: number;
 
   @Column({ type: 'boolean', default: true })
@@ -329,7 +329,7 @@ export class AppPreferences {
     return {
       appName: 'Homie',
       appVersion: '1.0.0',
-      defaultPort: 3001,
+      defaultPort: 9825,
       enableCORS: true,
       allowedOrigins: JSON.stringify(['http://localhost:3000']),
       enableCompression: true,
