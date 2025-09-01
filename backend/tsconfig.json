@@ -16,10 +16,10 @@
     "sourceMap": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "baseUrl": "./src",
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["*"],
-      "@/shared/*": ["../../shared/src/*"]
+      "@/*": ["src/*"],
+      "@/shared/*": ["../shared/src/*"]
     },
     "typeRoots": ["./node_modules/@types", "../../shared/src/types"]
   },

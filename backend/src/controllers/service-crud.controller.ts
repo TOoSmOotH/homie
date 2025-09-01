@@ -22,7 +22,7 @@ export class ServiceCrudController {
       });
 
       // Transform services to include manifest data at the definition level
-      const transformedServices = services.map(service => ({
+      const transformedServices = services.map((service: Service) => ({
         ...service,
         definition: service.definition ? {
           ...service.definition,

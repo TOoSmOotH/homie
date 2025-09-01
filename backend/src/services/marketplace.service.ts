@@ -480,10 +480,10 @@ export class MarketplaceService {
       });
       
       const lowerQuery = query.toLowerCase();
-      return services.filter(service => 
+      return services.filter((service: ServiceDefinition) => 
         service.name.toLowerCase().includes(lowerQuery) ||
         service.description.toLowerCase().includes(lowerQuery) ||
-        service.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
+        service.tags.some((tag: string) => tag.toLowerCase().includes(lowerQuery))
       );
     } catch (error) {
       logger.error('Failed to search services:', error);
