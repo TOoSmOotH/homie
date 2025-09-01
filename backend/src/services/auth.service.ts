@@ -34,13 +34,14 @@ export interface UserPayload {
 }
 
 export class AuthService {
-  private userRepository: Repository<User> | null = null;
+  // Lazily initialized repository; definite assignment to avoid nullable type
+  private userRepository!: Repository<User>;
 
   private getUserRepository(): Repository<User> {
     if (!this.userRepository) {
       this.userRepository = dbConnection.getDataSource().getRepository(User);
     }
-    return this.userRepository!;
+    return this.userRepository;
   }
 
   /**
