@@ -27,53 +27,59 @@ const App: React.FC = () => {
     >
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
-          <Router basename={import.meta.env.VITE_BASE_PATH || ''}>
-            <AuthProvider>
-              <WebSocketProvider>
-                <Routes>
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/setup" element={<InitialSetup />} />
-                  <Route path="/password-reset" element={<PasswordReset />} />
-                  <Route path="/verify-email" element={<EmailVerification />} />
-                  <Route element={<Layout />}>
-                    <Route
-                      path="/"
-                      element={
-                        <ProtectedRoute>
-                          <Dashboard />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/services"
-                      element={
-                        <ProtectedRoute>
-                          <Services />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/settings"
-                      element={
-                        <ProtectedRoute>
-                          <Settings />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/admin/users"
-                      element={
-                        <ProtectedRoute requireAdmin>
-                          <UserManagement />
-                        </ProtectedRoute>
-                      }
-                    />
-                  </Route>
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </WebSocketProvider>
-            </AuthProvider>
-          </Router>
+          {(() => {
+            const rawBase = (import.meta.env.VITE_BASE_PATH || import.meta.env.BASE_URL || '/') as string;
+            const normalizedBase = rawBase.endsWith('/') && rawBase !== '/' ? rawBase.slice(0, -1) : rawBase;
+            return (
+              <Router basename={normalizedBase}>
+                <AuthProvider>
+                  <WebSocketProvider>
+                    <Routes>
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/setup" element={<InitialSetup />} />
+                      <Route path="/password-reset" element={<PasswordReset />} />
+                      <Route path="/verify-email" element={<EmailVerification />} />
+                      <Route element={<Layout />}>
+                        <Route
+                          path="/"
+                          element={
+                            <ProtectedRoute>
+                              <Dashboard />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="/services"
+                          element={
+                            <ProtectedRoute>
+                              <Services />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="/settings"
+                          element={
+                            <ProtectedRoute>
+                              <Settings />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="/admin/users"
+                          element={
+                            <ProtectedRoute requireAdmin>
+                              <UserManagement />
+                            </ProtectedRoute>
+                          }
+                        />
+                      </Route>
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </WebSocketProvider>
+                </AuthProvider>
+              </Router>
+            );
+          })()}
         </ThemeProvider>
       </QueryClientProvider>
     </ErrorBoundary>

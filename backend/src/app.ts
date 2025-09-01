@@ -28,8 +28,10 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      connectSrc: ["'self'", 'ws:', 'wss:'],
       imgSrc: ["'self'", 'data:', 'https:'],
+      baseUri: ["'self'"],
     },
   },
 }));
