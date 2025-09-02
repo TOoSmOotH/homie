@@ -53,8 +53,8 @@ app.use(helmet({
   },
 }));
 
-// CORS middleware
-app.use(corsMiddleware);
+// CORS middleware (apply only to API routes to avoid interfering with static assets)
+app.use(config.apiPrefix, corsMiddleware);
 
 // Rate limiting
 const limiter = rateLimit({
