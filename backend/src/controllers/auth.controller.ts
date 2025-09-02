@@ -334,4 +334,38 @@ export class AuthController {
       next(error);
     }
   };
+
+  /**
+   * Change password (authenticated user)
+   */
+  changePassword = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      if (!req.user) {
+        throw new AppError('Authentication required', 401);
+      }
+
+      const { currentPassword, newPassword } = req.body as { currentPassword?: string; newPassword?: string };
+
+      if (!currentPassword || !newPassword) {
+        throw new AppError('Current and new password are required', 400);
+      }
+
+      if (newPassword.length < 8) {
+        throw new AppError('New password must be at least 8 characters', 400);
+      }
+
+      await this.authService.changePassword(req.user.id, currentPassword, newPassword);
+
+      res.json({
+        success: true,
+        message: 'Password changed successfully'
+      });
+    } catch (error: any) {
+      // Map common errors to friendly responses
+      if (error?.message === 'Current password is incorrect') {
+        return next(new AppError('Current password is incorrect', 400));
+      }
+      next(error);
+    }
+  };
 }

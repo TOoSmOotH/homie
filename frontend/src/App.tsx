@@ -10,6 +10,7 @@ import Layout from './components/layout/Layout';
 import Dashboard from './pages/Dashboard';
 import Services from './pages/Services';
 import Settings from './pages/Settings';
+import Profile from './pages/Profile';
 import Login from './pages/Login';
 import InitialSetup from './pages/InitialSetup';
 import PasswordReset from './pages/PasswordReset';
@@ -53,6 +54,14 @@ const App: React.FC = () => {
                           element={
                             <ProtectedRoute>
                               <Services />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="/profile"
+                          element={
+                            <ProtectedRoute>
+                              <Profile />
                             </ProtectedRoute>
                           }
                         />

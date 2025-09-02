@@ -45,6 +45,33 @@ export class AuthService {
   }
 
   /**
+   * Change password for the authenticated user
+   */
+  async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<void> {
+    try {
+      const user = await this.getUserRepository().findOne({ where: { id: userId } });
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      // Verify current password
+      const isValid = await this.verifyPassword(currentPassword, user.passwordHash);
+      if (!isValid) {
+        throw new Error('Current password is incorrect');
+      }
+
+      // Hash and set new password
+      const passwordHash = await this.hashPassword(newPassword);
+      user.passwordHash = passwordHash;
+      await this.getUserRepository().save(user);
+
+      logger.info(`Password changed for user: ${user.username}`);
+    } catch (error) {
+      logger.error('Change password error:', error);
+      throw error;
+    }
+  }
+  /**
    * Check if this is the first time setup (no admin exists)
    */
   async isFirstTimeSetup(): Promise<boolean> {

@@ -120,9 +120,14 @@ export class MarketplaceService {
       const definition = JSON.parse(content);
       
       // Validate the definition (basic validation)
-      if (!definition.id || !definition.name || !definition.version) {
+      if (!definition.id || !definition.name) {
         logger.warn(`Invalid service definition in ${filePath}`);
         return;
+      }
+      
+      // Default version when missing
+      if (!definition.version) {
+        definition.version = '1.0.0';
       }
       
       // Save or update in database
@@ -151,7 +156,7 @@ export class MarketplaceService {
         // Update existing definition
         definition.name = manifest.name;
         definition.displayName = manifest.name;
-        definition.version = manifest.version;
+        definition.version = manifest.version || '1.0.0';
         definition.author = manifest.author;
         definition.description = manifest.description;
         definition.longDescription = manifest.longDescription;
@@ -170,7 +175,7 @@ export class MarketplaceService {
           serviceId: manifest.id,
           name: manifest.name,
           displayName: manifest.name,
-          version: manifest.version,
+          version: manifest.version || '1.0.0',
           author: manifest.author,
           description: manifest.description,
           longDescription: manifest.longDescription,

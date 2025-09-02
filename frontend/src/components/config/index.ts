@@ -1,2 +1,2 @@
 export { ServiceConfig } from './ServiceConfig';
-export { UserSettings } from './UserSettings';
+export { SystemSettings } from './SystemSettings';

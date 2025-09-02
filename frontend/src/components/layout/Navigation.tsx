@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/utils/responsive';
-import { cn } from '@/utils/cn';
 import homieLogo from '@/assets/homie.png';
 import {
-  Home,
-  Settings,
-  Server,
   Menu,
   Sun,
   Moon,
@@ -22,18 +18,12 @@ interface NavigationProps {
 }
 
 const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
-  const location = useLocation();
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
   const isMobile = useIsMobile();
   const [showUserMenu, setShowUserMenu] = useState(false);
 
-  const navigationItems = [
-    { path: '/', label: 'Dashboard', icon: Home },
-    { path: '/services', label: 'Services', icon: Server },
-    { path: '/settings', label: 'Settings', icon: Settings },
-  ];
-
+  
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
       <div className="flex items-center justify-between px-4 py-3">
@@ -53,31 +43,7 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
           </Link>
         </div>
 
-        {/* Desktop Navigation */}
-        {!isMobile && (
-          <div className="flex items-center space-x-1">
-            {navigationItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = location.pathname === item.path;
-
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={cn(
-                    "flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
-                    isActive
-                      ? "bg-primary-100 text-primary-700"
-                      : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  )}
-                >
-                  <Icon className="h-4 w-4" />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-          </div>
-        )}
+        {/* Desktop Navigation removed (navigation available in Sidebar) */}
 
         {/* Right side - Theme toggle and user menu */}
         <div className="flex items-center space-x-2">
@@ -113,6 +79,13 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
                   <div className="px-3 py-2 text-xs text-gray-500 dark:text-gray-400">
                     {user?.email}
                   </div>
+                  <Link
+                    to="/profile"
+                    className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                    onClick={() => setShowUserMenu(false)}
+                  >
+                    Profile
+                  </Link>
                   {user?.role === 'ADMIN' && (
                     <Link
                       to="/admin/users"
@@ -122,13 +95,7 @@ const Navigation: React.FC<NavigationProps> = ({ onMenuClick }) => {
                       Manage Users
                     </Link>
                   )}
-                  <Link
-                    to="/settings"
-                    className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                    onClick={() => setShowUserMenu(false)}
-                  >
-                    Settings
-                  </Link>
+                  {/* Settings link removed from user menu; available via Sidebar */}
                   <hr className="my-2 border-gray-200 dark:border-gray-700" />
                   <button
                     onClick={() => {

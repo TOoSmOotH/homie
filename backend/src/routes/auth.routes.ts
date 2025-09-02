@@ -57,6 +57,20 @@ const validateRefreshToken = (req: Request, res: Response, next: NextFunction) =
   next();
 };
 
+const validateChangePassword = (req: Request, res: Response, next: NextFunction) => {
+  const { currentPassword, newPassword } = req.body as { currentPassword?: string; newPassword?: string };
+
+  if (!currentPassword || currentPassword.length < 6) {
+    throw new AppError('Current password must be at least 6 characters', 400);
+  }
+
+  if (!newPassword || newPassword.length < 8) {
+    throw new AppError('New password must be at least 8 characters', 400);
+  }
+
+  next();
+};
+
 // Public routes (no authentication required)
 router.get('/check-setup', authController.checkFirstTimeSetup);
 router.get('/features', authController.getFeatures);
@@ -68,6 +82,7 @@ router.post('/refresh-token', validateRefreshToken, authController.refreshToken)
 // Protected routes (authentication required)
 router.post('/logout', authenticateToken, authController.logout);
 router.get('/me', authenticateToken, authController.getProfile);
+router.post('/change-password', authenticateToken, validateChangePassword, authController.changePassword);
 
 // Email verification routes
 router.post('/verify-email', authController.verifyEmail);

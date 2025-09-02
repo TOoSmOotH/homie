@@ -13,16 +13,26 @@ export class MarketplaceController {
   getServices = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const services = await marketplaceService.getAvailableServices();
-      
-      // Transform services to include manifest data at the top level
-      const transformedServices = services.map(service => ({
-        ...service,
-        ...service.manifest,
-        // Keep the original id from the entity
-        id: service.id,
-        // Use serviceId from the manifest
-        serviceId: service.serviceId
-      }));
+
+      // Transform services to include manifest data with safe overrides
+      const transformedServices = services.map((service) => {
+        const manifest: any = service.manifest || {};
+        return {
+          ...service,
+          ...manifest,
+          // Ensure stable identifiers from entity
+          id: service.id,
+          serviceId: service.serviceId,
+          // Explicitly set fields to avoid undefined overrides
+          version: (manifest.version ?? service.version) || '1.0.0',
+          author: manifest.author ?? service.author,
+          displayName: manifest.displayName ?? service.displayName ?? service.name,
+          name: manifest.name ?? service.name,
+          icon: manifest.icon ?? service.icon,
+          category: manifest.category ?? service.category,
+          tags: manifest.tags ?? service.tags ?? [],
+        } as any;
+      });
       
       res.json({
         success: true,
