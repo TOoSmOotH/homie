@@ -34,13 +34,21 @@ app.use(helmet({
   // Suppress Origin-Agent-Cluster header to reduce confusing console noise
   originAgentCluster: false,
   contentSecurityPolicy: {
+    useDefaults: false,
     directives: {
+      // IMPORTANT: Do NOT include 'upgrade-insecure-requests' so HTTP works behind external TLS proxies
+      upgradeInsecureRequests: null,
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'", "'unsafe-inline'"],
       connectSrc: ["'self'", 'ws:', 'wss:'],
       imgSrc: ["'self'", 'data:', 'https:'],
       baseUri: ["'self'"],
+      objectSrc: ["'none'"],
+      frameAncestors: ["'self'"],
+      formAction: ["'self'"],
+      fontSrc: ["'self'", 'https:', 'data:'],
+      scriptSrcAttr: ["'none'"],
     },
   },
 }));
