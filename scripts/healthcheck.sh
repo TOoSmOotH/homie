@@ -20,7 +20,10 @@ if ! curl -f -s http://localhost:${PORT}${API_PREFIX}/health > /dev/null 2>&1; t
 fi
 
 # Check if backend is serving the frontend
-if ! curl -f -s -I http://localhost:${PORT}/homie > /dev/null 2>&1; then
+BASE_PATH=${BASE_PATH:-/}
+FRONT_PATH=${BASE_PATH%/}
+if [ -z "$FRONT_PATH" ]; then FRONT_PATH=/; fi
+if ! curl -f -s -I http://localhost:${PORT}${FRONT_PATH} > /dev/null 2>&1; then
     echo "❌ Frontend is not being served by backend"
     exit 1
 fi

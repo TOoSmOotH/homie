@@ -8,6 +8,7 @@ echo "🚀 Starting Homie production application (no nginx)..."
 export NODE_ENV=${NODE_ENV:-production}
 export PORT=${PORT:-9825}
 export API_PREFIX=${API_PREFIX:-/api}
+export BASE_PATH=${BASE_PATH:-/}
 
 # Create necessary directories with proper permissions
 mkdir -p /app/data /app/logs
@@ -68,7 +69,9 @@ main() {
 
     echo "✅ Homie application started successfully!"
     echo "📊 Backend: http://localhost:$PORT"
-    echo "🌐 Frontend: http://localhost:${PORT}/homie"
+    FRONT_PATH=${BASE_PATH%/}
+    if [ -z "$FRONT_PATH" ]; then FRONT_PATH=/; fi
+    echo "🌐 Frontend: http://localhost:${PORT}${FRONT_PATH}"
 
     # Wait for processes
     wait $BACKEND_PID

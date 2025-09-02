@@ -90,12 +90,19 @@ app.get(`${config.apiPrefix}/health`, (req, res) => {
   });
 });
 
-// Serve frontend in production at /homie
+// Serve frontend in production (configurable base path)
 if (config.nodeEnv === 'production') {
   const staticDir = path.resolve(__dirname, 'public');
-  app.use('/homie', express.static(staticDir));
-  // SPA fallback
-  app.get('/homie/*', (_req, res) => {
+  const basePath = (config.basePath && config.basePath !== '/') ? config.basePath : '/';
+
+  // Static assets
+  app.use(basePath, express.static(staticDir));
+
+  // SPA fallback: avoid capturing API routes
+  const spaFallbackPath = basePath === '/' ? '*' : `${basePath}*`;
+  app.get(spaFallbackPath, (req, res, next) => {
+    // If request targets API, let API routes handle it
+    if (req.path.startsWith(config.apiPrefix)) return next();
     res.sendFile(path.join(staticDir, 'index.html'));
   });
 }
