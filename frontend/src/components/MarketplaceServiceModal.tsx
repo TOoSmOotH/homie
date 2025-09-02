@@ -81,7 +81,7 @@ const MarketplaceServiceModal: React.FC<Props> = ({
                   )}
                 </h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  v{service.version} by {service.author}
+                  Dashboard version v{service.version}
                 </p>
               </div>
             </div>
