@@ -10,6 +10,62 @@
   "icon": "🖥️",
   "homepage": "https://www.proxmox.com/en/proxmox-ve",
   "documentation": "https://pve.proxmox.com/pve-docs/",
+  "features": [
+    {
+      "id": "cluster_overview",
+      "name": "Cluster Overview",
+      "description": "High-level view of cluster state and nodes",
+      "icon": "🧩",
+      "capabilities": [
+        "Nodes online/offline",
+        "Cluster status",
+        "Resources summary"
+      ]
+    },
+    {
+      "id": "vm_management",
+      "name": "VM Management",
+      "description": "List, start, and stop VMs and containers",
+      "icon": "🖥️",
+      "capabilities": [
+        "Show running VMs/containers",
+        "Start VM/CT",
+        "Stop VM/CT",
+        "Node and ID context"
+      ]
+    },
+    {
+      "id": "node_metrics",
+      "name": "Node Metrics",
+      "description": "Live node metrics at a glance",
+      "icon": "📈",
+      "capabilities": [
+        "CPU usage",
+        "Memory usage",
+        "Uptime"
+      ]
+    },
+    {
+      "id": "storage_usage",
+      "name": "Storage Usage",
+      "description": "Datastore capacity and usage",
+      "icon": "💾",
+      "capabilities": [
+        "Used/Free space",
+        "Per-datastore breakdown"
+      ]
+    },
+    {
+      "id": "version_info",
+      "name": "Version & API",
+      "description": "Cluster version and API health",
+      "icon": "🧭",
+      "capabilities": [
+        "PVE version",
+        "API availability"
+      ]
+    }
+  ],
   "connection": {
     "type": "api",
     "auth": "token",
