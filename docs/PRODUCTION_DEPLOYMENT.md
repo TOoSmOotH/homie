@@ -1,6 +1,6 @@
 # Homie Production Deployment Guide
 
-This guide covers the complete production deployment process for Homie with a simplified container: a single HTTP port is exposed by the app, and TLS/SSL is handled by your external reverse proxy (e.g., Nginx, Traefik, Caddy). No web server runs inside the container.
+This guide covers the complete production deployment process for Homie using two services (frontend and backend). TLS/SSL is handled by your external reverse proxy (e.g., Nginx, Traefik, Caddy). No web server runs inside the containers.
 
 ## Table of Contents
 
@@ -70,7 +70,7 @@ chmod +x scripts/deploy.sh
 
 ### 3. Configure Reverse Proxy TLS
 
-Terminate TLS at your reverse proxy and forward HTTP to the Homie container on port 9825. See Reverse Proxy & TLS below for examples.
+Terminate TLS at your reverse proxy and forward HTTP to the Homie services on host ports 9826 (frontend) and 9827 (backend). See Reverse Proxy & TLS below for examples.
 
 ## Configuration
 
@@ -82,7 +82,7 @@ Copy `.env.production` and configure the following critical variables:
 # Required
 NODE_ENV=production
 DOMAIN=your-domain.com
-PORT=9825
+BACKEND_PORT=9827
 
 # Security (Generate strong secrets)
 JWT_SECRET=your-64-character-random-string
@@ -94,30 +94,28 @@ SESSION_SECRET=your-32-character-random-string
 
 ### Docker Configuration
 
-The production setup uses a single optimized container with:
+The production setup uses two optimized containers with:
 
-- **Multi-stage build** for minimal image size
-- **Security hardening** with non-root user
-- **Health checks** for service monitoring
-- **Resource limits** for stability
-- Single HTTP port (9825) with TLS handled by your reverse proxy
+- Separate images for frontend and backend
+- Security hardening with non-root users
+- Resource limits for stability
+- Two HTTP ports (9826 for frontend, 9827 for backend) with TLS handled by your reverse proxy
 
 ### Network Configuration
 
 - **Internal**: Services communicate via Docker networks
-- **External**: Expose a single HTTP port (default host port 9825 mapped to container 9825); terminate TLS on your proxy
+- **External**: Expose two HTTP ports (default host ports 9826 -> 3000 for frontend, 9827 -> 9827 for backend); terminate TLS on your proxy
 - **WebSocket**: Support for real-time features
 
 ## Reverse Proxy & TLS
 
-Homie serves HTTP on container port 9825. Configure your reverse proxy to terminate TLS and forward traffic to the container.
+Homie serves HTTP on two ports. Configure your reverse proxy to terminate TLS and forward traffic to the containers.
 
 Example Nginx configuration:
 
 ```nginx
-upstream homie {
-  server homie:9825;
-}
+upstream homie_frontend { server frontend:3000; }
+upstream homie_backend { server backend:9827; }
 
 server {
   listen 80;
@@ -132,18 +130,18 @@ server {
   # ssl_certificate_key /path/to/privkey.pem;
 
   location /homie/ {
-    proxy_pass http://homie/homie/;
+    proxy_pass http://homie_frontend/homie/;
   }
 
   location /api/ {
-    proxy_pass http://homie/api/;
+    proxy_pass http://homie_backend/api/;
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
   }
 
   location /socket.io/ {
-    proxy_pass http://homie/socket.io/;
+    proxy_pass http://homie_backend/socket.io/;
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";

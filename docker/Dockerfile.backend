@@ -25,7 +25,7 @@ RUN cd backend && npm run build
 RUN mkdir -p /app/data /app/logs
 
 # Expose port
-EXPOSE 9825
+EXPOSE 9827
 
 # Start the application
 CMD ["node", "backend/dist/server.js"]

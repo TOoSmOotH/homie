@@ -1,71 +1,61 @@
 services:
-  homie:
+  backend:
     build:
       context: .
-      dockerfile: docker/Dockerfile.production
-      target: production
-    image: homie:latest
-    container_name: homie
+      dockerfile: docker/Dockerfile.backend
+    image: homie-backend:latest
+    container_name: homie-backend
     restart: unless-stopped
 
-    # Environment configuration
     env_file:
       - .env.production
     environment:
       - NODE_ENV=production
       - TZ=${TZ:-UTC}
-      - PORT=9825
+      - PORT=9827
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:9826}
+      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost:9826}
 
-    # Port configuration (single HTTP port)
     ports:
-      - "${HTTP_PORT:-9825}:9825"
+      - "${BACKEND_PORT:-9827}:9827"
 
-    # Volume mounts for persistent data
     volumes:
       - ./data:/app/data
       - ./logs:/app/logs
 
-    # Health checks
-    healthcheck:
-      test: ["CMD", "/app/healthcheck.sh"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
-    # Resource limits (optional, can be adjusted based on your needs)
-    deploy:
-      resources:
-        limits:
-          cpus: '2.0'
-          memory: 2G
-        reservations:
-          cpus: '0.5'
-          memory: 512M
-
-    # Security options
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    cap_add:
-      - CHOWN
-      - SETUID
-      - SETGID
-      - DAC_OVERRIDE
-
-    # Logging configuration
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
 
-    # Networks
     networks:
       - homie-network
 
-# Networks
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    image: homie-frontend:latest
+    container_name: homie-frontend
+    restart: unless-stopped
+
+    environment:
+      - NODE_ENV=production
+      - TZ=${TZ:-UTC}
+
+    ports:
+      - "${FRONTEND_PORT:-9826}:3000"
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    networks:
+      - homie-network
+
 networks:
   homie-network:
     driver: bridge

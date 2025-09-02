@@ -145,10 +145,12 @@ The dev stack exposes:
 ### Production
 
 ```bash
-docker-compose up -d
+docker compose up -d --build
 ```
 
-Production exposes the backend on container port `9825`. The default compose maps `${HTTP_PORT:-9825}` on the host to `9825` in the container. The backend serves the built frontend at `/homie` and the API at `/api`.
+Production uses two services and two ports by default:
+- Frontend (Vite preview) on host `9826` (container `3000`)
+- Backend (Express API + Socket.IO) on host `9827` (container `9827`)
 
 ### Fresh Instance Behavior
 - Database: The backend auto-creates the SQLite database at `DB_PATH` on first start; parent directories are created if missing.
@@ -217,24 +219,24 @@ services:
 
 Terminate TLS in your proxy and forward to the container over HTTP:
 
-- Frontend: proxy `/<your-base>/homie` to `http://<container>:9825/homie`
-- API: proxy `/api` to `http://<container>:9825/api`
-- WebSocket: proxy `/socket.io` to `http://<container>:9825/socket.io` with upgrade headers
+- Frontend: proxy `/<your-base>/homie` to `http://frontend:3000/homie`
+- API: proxy `/api` to `http://backend:9827/api`
+- WebSocket: proxy `/socket.io` to `http://backend:9827/socket.io` with upgrade headers
 
 Example Nginx location blocks:
 
 ```nginx
 location /homie/ {
-  proxy_pass http://homie:9825/homie/;
+  proxy_pass http://frontend:3000/homie/;
 }
 location /api/ {
-  proxy_pass http://homie:9825/api/;
+  proxy_pass http://backend:9827/api/;
   proxy_http_version 1.1;
   proxy_set_header Upgrade $http_upgrade;
   proxy_set_header Connection "upgrade";
 }
 location /socket.io/ {
-  proxy_pass http://homie:9825/socket.io/;
+  proxy_pass http://backend:9827/socket.io/;
   proxy_http_version 1.1;
   proxy_set_header Upgrade $http_upgrade;
   proxy_set_header Connection "upgrade";
