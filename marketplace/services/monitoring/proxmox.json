@@ -1,0 +1,121 @@
+{
+  "id": "proxmox",
+  "name": "Proxmox VE",
+  "version": "1.0.0",
+  "author": "Proxmox",
+  "description": "Monitor your Proxmox VE cluster: nodes, VMs, CPU, memory, and storage.",
+  "longDescription": "Connect Homie to your Proxmox VE cluster to view node and VM status at a glance. Fetches summary metrics via the Proxmox API for dashboards and quick actions.",
+  "category": "monitoring",
+  "tags": ["monitoring", "virtualization", "hypervisor", "proxmox", "cluster"],
+  "icon": "🖥️",
+  "homepage": "https://www.proxmox.com/en/proxmox-ve",
+  "documentation": "https://pve.proxmox.com/pve-docs/",
+  "connection": {
+    "type": "api",
+    "auth": "token",
+    "fields": [
+      {
+        "key": "url",
+        "label": "Proxmox URL",
+        "type": "url",
+        "required": true,
+        "placeholder": "https://proxmox.example.local:8006",
+        "description": "Base URL of your Proxmox VE API"
+      },
+      {
+        "key": "token_id",
+        "label": "API Token ID",
+        "type": "text",
+        "required": true,
+        "placeholder": "root@pam!homie",
+        "description": "Format: user@realm!token-name"
+      },
+      {
+        "key": "token_secret",
+        "label": "API Token Secret",
+        "type": "password",
+        "required": true
+      }
+    ],
+    "testEndpoint": {
+      "path": "/api2/json/version",
+      "method": "GET",
+      "headers": {
+        "Authorization": "PVEAPIToken {token_id}={token_secret}"
+      },
+      "expectedStatus": 200,
+      "successIndicator": "version"
+    }
+  },
+  "api": {
+    "baseUrl": "{url}",
+    "headers": {
+      "Authorization": "PVEAPIToken {token_id}={token_secret}",
+      "Content-Type": "application/json"
+    },
+    "endpoints": {
+      "version": { "path": "/api2/json/version", "method": "GET", "refresh": 600000 },
+      "nodes": { "path": "/api2/json/nodes", "method": "GET", "refresh": 60000 },
+      "cluster": { "path": "/api2/json/cluster/status", "method": "GET", "refresh": 60000 },
+      "resources": { "path": "/api2/json/cluster/resources", "method": "GET", "refresh": 60000 }
+    }
+  },
+  "widgets": [
+    {
+      "id": "cluster_health",
+      "name": "Cluster Health",
+      "type": "stat",
+      "icon": "❤️",
+      "size": "small",
+      "dataSource": "cluster",
+      "display": {
+        "value": "{data.length} nodes",
+        "label": "Nodes Online",
+        "color": "primary"
+      }
+    },
+    {
+      "id": "node_list",
+      "name": "Nodes",
+      "type": "list",
+      "icon": "🖥️",
+      "size": "large",
+      "dataSource": "nodes",
+      "display": {
+        "itemTemplate": {
+          "title": "{node}",
+          "subtitle": "CPU: {cpu|percentage} • Mem: {mem|filesize}/{maxmem|filesize} • Status: {status}"
+        },
+        "emptyMessage": "No nodes found",
+        "maxItems": 10
+      }
+    }
+  ],
+  "transformers": {
+    "filesize": "function(bytes){return (bytes/1024/1024/1024).toFixed(2)+' GB';}",
+    "percentage": "function(value){return (value*100).toFixed(1)+'%';}"
+  },
+  "settings": {
+    "sections": [
+      {
+        "id": "display",
+        "name": "Display",
+        "icon": "🎨",
+        "fields": [
+          { "key": "show_nodes", "label": "Show Nodes", "type": "boolean", "default": true },
+          { "key": "show_cluster", "label": "Show Cluster Health", "type": "boolean", "default": true }
+        ]
+      }
+    ]
+  },
+  "quickActions": [
+    {
+      "id": "open_ui",
+      "name": "Open Proxmox UI",
+      "icon": "🔗",
+      "action": "open_url",
+      "config": { "url": "{url}" }
+    }
+  ]
+}
+
