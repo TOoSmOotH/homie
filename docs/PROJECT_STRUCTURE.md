@@ -351,12 +351,12 @@ services:
 1. Clone the repository
 2. Run `scripts/setup.sh` to initialize development environment
 3. Start services with `docker compose -f docker/docker-compose.dev.yml up`
-4. Access frontend at `http://localhost:9826/homie`
+4. Access frontend at `http://localhost:9826`
 
 ### Building for Production
 1. Run `scripts/build.sh` to build all components
 2. Use `docker compose -f docker/docker-compose.prod.yml up` for production
-3. Configure reverse proxy to serve `/homie` path
+3. Configure reverse proxy to serve `/` path
 
 ## Key Design Decisions
 

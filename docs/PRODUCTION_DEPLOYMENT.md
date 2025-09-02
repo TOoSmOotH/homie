@@ -196,7 +196,7 @@ docker compose logs
 
 ### Health Check Endpoints
 
-- Application Health: `http(s)://your-domain.com/homie` (serves SPA)
+- Application Health: `http(s)://your-domain.com/` (serves SPA)
 - API Health: `http(s)://your-domain.com/api/health`
 
 ### Monitoring Commands

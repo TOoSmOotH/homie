@@ -150,7 +150,7 @@ A web-based application for monitoring and controlling your home lab services in
 2. Copy `.env.example` to `.env` and configure your settings
 3. Run `npm install`
 4. Run `npm run docker:dev` for development
-5. Access the application at `http://localhost:9826/homie`
+5. Access the application at `http://localhost:9826`
 
 ## Documentation
 
@@ -491,7 +491,7 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  base: '/homie/',
+  base: process.env.VITE_BASE_PATH || '/',
   server: {
     port: 9826,
     proxy: {
@@ -532,7 +532,7 @@ const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ThemeProvider>
-          <Router basename="/homie">
+          <Router basename={import.meta.env.BASE_URL}>
             <Layout>
               <Routes>
                 <Route path="/login" element={<Login />} />
@@ -681,9 +681,9 @@ http {
         index index.html;
 
         # Frontend
-        location /homie {
-            alias /usr/share/nginx/html/homie;
-            try_files $uri $uri/ /homie/index.html;
+        location / {
+            alias /usr/share/nginx/html/;
+            try_files $uri $uri/ /index.html;
         }
 
         # Backend API

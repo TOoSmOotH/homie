@@ -74,7 +74,7 @@ The application follows a modern full-stack architecture:
    ```
 
 4. **Access the application**
-   - Frontend: http://localhost:9826/homie
+   - Frontend: http://localhost:9826
    - Backend API: http://localhost:9827/api
 
 ### Production Deployment
@@ -149,7 +149,7 @@ JWT_EXPIRES_IN=7d
 
 # Frontend
 FRONTEND_URL=http://localhost:9826
-BASE_PATH=/homie
+BASE_PATH=/
 
 ```
 

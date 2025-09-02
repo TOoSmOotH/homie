@@ -219,15 +219,15 @@ services:
 
 Terminate TLS in your proxy and forward to the container over HTTP:
 
-- Frontend: proxy `/<your-base>/homie` to `http://frontend:3000/homie`
+- Frontend: proxy `/` to `http://frontend:3000/`
 - API: proxy `/api` to `http://backend:9827/api`
 - WebSocket: proxy `/socket.io` to `http://backend:9827/socket.io` with upgrade headers
 
 Example Nginx location blocks:
 
 ```nginx
-location /homie/ {
-  proxy_pass http://frontend:3000/homie/;
+location / {
+  proxy_pass http://frontend:3000/;
 }
 location /api/ {
   proxy_pass http://backend:9827/api/;

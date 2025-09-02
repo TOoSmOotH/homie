@@ -4,7 +4,7 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
-  base: process.env.NODE_ENV === 'production' ? '/homie/' : '/',
+  base: process.env.VITE_BASE_PATH || '/',
   server: {
     port: 9826,
     host: true,

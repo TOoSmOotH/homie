@@ -46,7 +46,7 @@ docker-compose up -d
 ```
 
 6. **Access the application:**
-- Navigate to `http://localhost:9825/homie`
+- Navigate to `http://localhost:9826`
 - Complete initial admin setup
 
 ## Production Deployment
@@ -99,8 +99,8 @@ server {
     add_header X-XSS-Protection "1; mode=block" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 
-    location /homie {
-        proxy_pass http://localhost:9825;
+    location / {
+        proxy_pass http://localhost:9826;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
