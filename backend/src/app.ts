@@ -26,6 +26,11 @@ app.set('trust proxy', 1);
 app.use(helmet({
   // Explicitly disable HSTS to avoid browsers forcing HTTPS on custom hosts/ports
   hsts: false,
+  // Disable COOP/COEP on non-secure origins to avoid noisy browser warnings
+  crossOriginOpenerPolicy: false,
+  crossOriginEmbedderPolicy: false,
+  // Relax CORP so static assets can load from same-origin HTTP without issues
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
   // Suppress Origin-Agent-Cluster header to reduce confusing console noise
   originAgentCluster: false,
   contentSecurityPolicy: {
