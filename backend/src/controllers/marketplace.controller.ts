@@ -24,7 +24,9 @@ export class MarketplaceController {
           id: service.id,
           serviceId: service.serviceId,
           // Explicitly set fields to avoid undefined overrides
-          version: (manifest.version ?? service.version) || '1.0.0',
+          // Marketplace version should reflect definition versioning, not the app's.
+          // For now, we standardize all marketplace service versions to start at 1.0.0.
+          version: '1.0.0',
           author: manifest.author ?? service.author,
           displayName: manifest.displayName ?? service.displayName ?? service.name,
           name: manifest.name ?? service.name,
