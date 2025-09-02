@@ -70,8 +70,8 @@ const limiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Apply rate limiting to all requests
-app.use(config.basePath || '/', limiter);
+// Apply rate limiting only to API routes
+app.use(config.apiPrefix, limiter);
 
 // Logging
 app.use(morgan('combined', { stream: { write: message => logger.info(message.trim()) } }));
@@ -114,8 +114,13 @@ if (config.nodeEnv === 'production') {
   // SPA fallback: avoid capturing API routes
   const spaFallbackPath = basePath === '/' ? '*' : `${basePath}*`;
   app.get(spaFallbackPath, (req, res, next) => {
-    // If request targets API, let API routes handle it
-    if (req.path.startsWith(config.apiPrefix)) return next();
+    // If request targets API or a static asset path, let those handlers handle it
+    if (req.path.startsWith(config.apiPrefix) || req.path.startsWith(`${basePath}assets/`)) {
+      return next();
+    }
+    // Only serve SPA for navigation requests that accept HTML
+    const acceptsHtml = req.headers.accept && req.headers.accept.includes('text/html');
+    if (!acceptsHtml) return next();
     res.sendFile(path.join(staticDir, 'index.html'));
   });
 }
