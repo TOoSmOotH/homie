@@ -91,7 +91,7 @@ export class GenericServiceController {
         // Build request configuration (HTTP)
         const requestConfig: AxiosRequestConfig = {
           method: endpointDef.method || 'GET',
-          url: `${service.config.url}${endpointDef.path}`,
+          url: `${service.config.url}${this.interpolateValue(String(endpointDef.path || ''), { ...service.config, ...(params || {}) })}`,
           timeout: 10000
         };
 
@@ -99,7 +99,7 @@ export class GenericServiceController {
         const headers: any = {};
         if (service.definition?.manifest?.api?.headers) {
           for (const [key, value] of Object.entries(service.definition.manifest.api.headers)) {
-            headers[key] = this.interpolateValue(value as string, service.config);
+            headers[key] = this.interpolateValue(value as string, { ...service.config, ...(params || {}) });
           }
         }
         requestConfig.headers = headers;
@@ -116,7 +116,7 @@ export class GenericServiceController {
           const defaultParams = {
             startDate: startOfWeek.toISOString().split('T')[0],
             endDate: endOfWeek.toISOString().split('T')[0],
-            ...params
+            ...(params || {})
           };
 
           for (const [key, value] of Object.entries(endpointDef.params)) {
@@ -130,7 +130,18 @@ export class GenericServiceController {
 
         // Add body for POST/PUT requests
         if (endpointDef.body && (endpointDef.method === 'POST' || endpointDef.method === 'PUT')) {
-          requestConfig.data = endpointDef.body;
+          if (typeof endpointDef.body === 'string') {
+            requestConfig.data = this.interpolateValue(endpointDef.body as string, { ...service.config, ...(params || {}) });
+          } else {
+            // Interpolate placeholders within JSON body
+            const bodyStr = JSON.stringify(endpointDef.body);
+            const interpolated = this.interpolateValue(bodyStr, { ...service.config, ...(params || {}) });
+            try {
+              requestConfig.data = JSON.parse(interpolated);
+            } catch {
+              requestConfig.data = endpointDef.body;
+            }
+          }
         }
 
         logger.debug(`Making HTTP request to: ${requestConfig.url}`);
@@ -490,7 +501,7 @@ export class GenericServiceController {
   executeAction = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
-      const { actionId } = req.body;
+      const { actionId, params } = req.body as { actionId: string; params?: Record<string, any> };
 
       // Get service with definition
       const dataSource = dbConnection.getDataSource();
@@ -533,15 +544,27 @@ export class GenericServiceController {
       const headers: any = {};
       if (service.definition?.manifest?.api?.headers) {
         for (const [key, value] of Object.entries(service.definition.manifest.api.headers)) {
-          headers[key] = this.interpolateValue(value as string, service.config);
+          headers[key] = this.interpolateValue(value as string, { ...service.config, ...(params || {}) });
+        }
+      }
+
+      const endpointPath = this.interpolateValue(String(action.api.endpoint || ''), { ...service.config, ...(params || {}) });
+      let dataBody: any = undefined;
+      if (action.api.body !== undefined) {
+        if (typeof action.api.body === 'string') {
+          dataBody = this.interpolateValue(action.api.body, { ...service.config, ...(params || {}) });
+        } else {
+          const bodyStr = JSON.stringify(action.api.body);
+          const interpolated = this.interpolateValue(bodyStr, { ...service.config, ...(params || {}) });
+          try { dataBody = JSON.parse(interpolated); } catch { dataBody = action.api.body; }
         }
       }
 
       const response = await axios({
         method: action.api.method || 'POST',
-        url: `${service.config.url}${action.api.endpoint}`,
+        url: `${service.config.url}${endpointPath}`,
         headers,
-        data: action.api.body,
+        data: dataBody,
         timeout: 10000
       });
 

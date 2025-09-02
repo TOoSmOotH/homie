@@ -37,6 +37,8 @@ interface Service {
   config?: any;
   definition?: {
     icon?: string;
+    displayName?: string;
+    manifest?: any;
     settings?: ServiceSettings;
     connection?: {
       fields: SettingsField[];
@@ -57,6 +59,9 @@ const ServiceSettingsModal: React.FC<Props> = ({ service, onClose }) => {
   const [hasChanges, setHasChanges] = useState(false);
   const [serviceName, setServiceName] = useState(service.name);
   const [connectionStatus, setConnectionStatus] = useState<'untested' | 'testing' | 'success' | 'failed'>('untested');
+  const [vmLoading, setVmLoading] = useState(false);
+  const [vms, setVms] = useState<any[]>([]);
+  const hasProxmox = !!service.definition?.manifest?.api?.endpoints?.vms;
 
   // Initialize settings from service config
   useEffect(() => {
@@ -133,6 +138,42 @@ const ServiceSettingsModal: React.FC<Props> = ({ service, onClose }) => {
     } catch (error) {
       console.error('Connection test failed:', error);
       setConnectionStatus('failed');
+    }
+  };
+
+  const fetchProxmoxVms = async () => {
+    if (!hasProxmox) return;
+    setVmLoading(true);
+    try {
+      const response = await axios.post(`/api/services/${service.id}/data`, { endpoint: 'vms' });
+      setVms(response.data.data || []);
+    } catch (e) {
+      console.error('Failed to load Proxmox VMs', e);
+      setVms([]);
+    } finally {
+      setVmLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (hasProxmox) {
+      fetchProxmoxVms();
+    }
+  }, [hasProxmox]);
+
+  const handleVmAction = async (actionId: 'start_vm' | 'stop_vm', vm: any) => {
+    try {
+      await axios.post(`/api/services/${service.id}/action`, {
+        actionId,
+        params: {
+          node: vm.node,
+          vmid: vm.vmid,
+          type: vm.type
+        }
+      });
+      await fetchProxmoxVms();
+    } catch (e) {
+      console.error('VM action failed:', e);
     }
   };
 
@@ -317,7 +358,9 @@ const ServiceSettingsModal: React.FC<Props> = ({ service, onClose }) => {
       fields: service.definition.connection.fields
     }] : []),
     // Other settings sections
-    ...(service.definition?.settings?.sections || [])
+    ...(service.definition?.settings?.sections || []),
+    // Dynamic Proxmox VM section
+    ...(hasProxmox ? [{ id: 'proxmox_vms', name: 'Proxmox VMs', icon: '🖥️', fields: [] as any[] }] : [])
   ];
 
   // Debug logging
@@ -475,6 +518,38 @@ const ServiceSettingsModal: React.FC<Props> = ({ service, onClose }) => {
                         )}
                       </div>
                     </>
+                  ) : section.id === 'proxmox_vms' ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-sm font-medium text-gray-900 dark:text-white">Running VMs</h4>
+                        <Button variant="outline" onClick={fetchProxmoxVms} disabled={vmLoading}>
+                          {vmLoading ? 'Refreshing…' : 'Refresh'}
+                        </Button>
+                      </div>
+                      {vmLoading ? (
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Loading VMs…</p>
+                      ) : vms.length === 0 ? (
+                        <p className="text-sm text-gray-500 dark:text-gray-400">No VMs found.</p>
+                      ) : (
+                        <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                          {vms.map((vm, idx) => (
+                            <div key={idx} className="py-3 flex items-center justify-between">
+                              <div>
+                                <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{vm.name || `${vm.type?.toUpperCase()} ${vm.vmid}`}</div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">Node: {vm.node} • ID: {vm.vmid} • Status: {vm.status}</div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                {vm.status === 'running' ? (
+                                  <Button variant="outline" onClick={() => handleVmAction('stop_vm', vm)}>Stop</Button>
+                                ) : (
+                                  <Button onClick={() => handleVmAction('start_vm', vm)}>Start</Button>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   ) : (
                     // Regular fields for other sections
                     section.fields.map((field) => (

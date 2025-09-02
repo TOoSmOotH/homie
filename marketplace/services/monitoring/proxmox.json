@@ -57,7 +57,14 @@
       "version": { "path": "/api2/json/version", "method": "GET", "refresh": 600000 },
       "nodes": { "path": "/api2/json/nodes", "method": "GET", "refresh": 60000 },
       "cluster": { "path": "/api2/json/cluster/status", "method": "GET", "refresh": 60000 },
-      "resources": { "path": "/api2/json/cluster/resources", "method": "GET", "refresh": 60000 }
+      "resources": { "path": "/api2/json/cluster/resources", "method": "GET", "refresh": 60000 },
+      "vms": {
+        "path": "/api2/json/cluster/resources",
+        "method": "GET",
+        "params": { "type": "vm" },
+        "refresh": 60000,
+        "transform": "response.data.filter(item => item.type && (item.type === 'qemu' || item.type === 'lxc'))"
+      }
     }
   },
   "widgets": [
@@ -115,7 +122,24 @@
       "icon": "🔗",
       "action": "open_url",
       "config": { "url": "{url}" }
+    },
+    {
+      "id": "start_vm",
+      "name": "Start VM",
+      "icon": "▶️",
+      "api": {
+        "endpoint": "/api2/json/nodes/{node}/{type}/{vmid}/status/start",
+        "method": "POST"
+      }
+    },
+    {
+      "id": "stop_vm",
+      "name": "Stop VM",
+      "icon": "⏹️",
+      "api": {
+        "endpoint": "/api2/json/nodes/{node}/{type}/{vmid}/status/stop",
+        "method": "POST"
+      }
     }
   ]
 }
-
