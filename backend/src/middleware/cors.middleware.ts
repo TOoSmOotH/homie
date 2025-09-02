@@ -1,20 +1,9 @@
 import cors from 'cors';
-import { config } from '../config';
 
+// Apply permissive CORS on API routes only. The app serves the SPA and API on the
+// same host in production; external TLS/proxy is expected to provide origin controls.
 export const corsMiddleware = cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, curl, etc.)
-    if (!origin) return callback(null, true);
-
-    // Allow localhost for development
-    if (origin.includes('localhost')) return callback(null, true);
-
-    // Check against configured CORS origin
-    if (origin === config.corsOrigin) return callback(null, true);
-
-    // Reject other origins
-    return callback(new Error('Not allowed by CORS'), false);
-  },
+  origin: true, // reflect request origin
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
