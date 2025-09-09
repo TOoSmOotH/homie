@@ -1,25 +1,28 @@
-FROM node:18-alpine
+FROM node:22-alpine
 
 # Set working directory
 WORKDIR /app
 
 # Copy package files
-COPY backend/package*.json ./backend/
+COPY package*.json ./
 COPY shared/package*.json ./shared/
+COPY backend/package*.json ./backend/
 
-# Install dependencies
-RUN cd backend && npm ci --only=production
-RUN cd shared && npm ci --only=production
+# Install root dependencies (ensure devDependencies are included)
+RUN npm ci --include=dev
 
-# Copy source code
-COPY backend ./backend
-COPY shared ./shared
+# Install backend and shared dependencies explicitly
+COPY shared/ ./shared/
+RUN cd shared && npm ci --include=dev && cd ..
+
+COPY backend/ ./backend/
+RUN cd backend && npm ci --include=dev && cd ..
 
 # Build shared types
-RUN cd shared && npm run build
+RUN npm run build --workspace=@homie/shared
 
-# Build backend
-RUN cd backend && npm run build
+# Build backend from project root to maintain workspace context
+RUN npm run build --workspace=@homie/backend
 
 # Create data directory
 RUN mkdir -p /app/data /app/logs
