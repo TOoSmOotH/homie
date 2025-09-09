@@ -244,7 +244,8 @@
   /* Scrollbar styles */
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: theme('colors.gray.400') transparent;
+    /* Tailwind v4: replace theme() usage with static color to avoid build error */
+    scrollbar-color: #9ca3af transparent; /* gray-400 */
   }
 
   .scrollbar-thin::-webkit-scrollbar {
